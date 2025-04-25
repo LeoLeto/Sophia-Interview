@@ -1,18 +1,19 @@
 .mainLayout {
-    display              : grid;
-    grid-template-columns: 1fr 2fr;
-    padding              : 2rem;
-    gap                  : 2rem;
-    height               : 100vh;
+    display                 : flex;
+    /* grid-template-columns: 1fr 2fr; */
+    padding                 : 3rem;
+    gap                     : 2rem;
+    height                  : 100vh;
     /* or 100% if the parent already defines height */
 }
 
 
 .leftSection {
-    display       : flex;
-    gap           : 2rem;
-    flex-direction: column;
-
+    display          : flex;
+    gap              : 2rem;
+    flex-direction   : column;
+    max-width        : 28rem;
+    /* margin-left   : auto; */
 }
 
 .avatarContainer {
@@ -25,18 +26,16 @@
     display        : flex;
     align-items    : center;
     justify-content: center;
+    box-shadow     : 3px 3px 12px rgba(0, 0, 0, 0.025);
 }
 
 .avatarContainer::before {
     content         : "";
     position        : absolute;
     inset           : 0;
-    background-color: #00000014;
-
-    /* semi-transparent gray */
-    backdrop-filter: blur(10px);
-    /* blurs whatever is *behind* this element */
-    z-index        : 0;
+    background-color: #ffffff70;
+    backdrop-filter : blur(10px);
+    z-index         : 0;
 }
 
 .avatarContainer img {
@@ -52,6 +51,14 @@
 .welcomeLabel {
     font-weight: 600;
     font-size  : 1.25rem;
+}
+
+.logoutButton {
+    margin    : auto auto 0 auto;
+    width     : fit-content;
+    background: unset;
+    color     : rgba(0, 0, 0, 0.7);
+    box-shadow: unset;
 }
 
 .messagesContainer {
@@ -71,11 +78,11 @@
 
 .initialHelperMessage {
     text-align: center;
-    color: #999;
+    color     : #999;
     font-style: italic;
-    margin: 1rem 0;
-  }
-  
+    margin    : 1rem 0;
+}
+
 
 .chatboxContainer {
     display: flex;
@@ -88,20 +95,28 @@ input[type="text"] {
     border-radius: 1rem;
 }
 
+input[type="password"] {
+    flex         : 1;
+    padding      : .75rem 1rem;
+    border-radius: 1rem;
+}
+
 button {
     cursor       : pointer;
     padding      : 8px 16px;
     border-radius: 1rem;
-    transition   : 0.2s;
     background   : linear-gradient(135deg, #a0c4ff, #bdb2ff);
     /* pastel blue to pastel purple */
     border       : none;
     color        : white;
     text-shadow  : 0px 0px 21px #0000007a;
+    box-shadow   : 3px 3px 12px rgba(0, 0, 0, 0.025);
+    transition   : 0.2s;
 }
 
 button:hover {
-    filter: drop-shadow(0 0 1em #a0c4ffaa);
+    filter       : drop-shadow(0 0 1em #a0c4ffaa);
+    border-radius: .25rem;
 }
 
 .rightSection {
@@ -111,6 +126,8 @@ button:hover {
     overflow      : hidden;
     display       : flex;
     flex-direction: column;
+    flex-grow     : 1;
+    box-shadow    : 3px 3px 12px rgba(0, 0, 0, 0.025);
 }
 
 

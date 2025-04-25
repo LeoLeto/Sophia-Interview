@@ -1,0 +1,38 @@
+.loginContainer {
+    display         : flex;
+    flex-direction  : column;
+    width           : 300px;
+    padding         : 1rem;
+    gap             : 1rem;
+    background-color: #ffffff70;
+    border-radius   : 1rem;
+    box-shadow      : 3px 3px 12px rgba(0, 0, 0, 0.025);
+    text-align      : center;
+}
+
+.formGroup {
+    margin-bottom: 15px;
+}
+
+.formGroup label {
+    font-size: 14px;
+    color    : #333;
+}
+
+.formGroup input {
+    width        : 100%;
+    margin-top: 1rem;
+}
+
+.loginCover {
+    overflow     : hidden;
+    border-radius: 1rem;
+    object-fit   : cover;
+    height       : 100%;
+}
+
+.error {
+    color     : rgba(255, 0, 0, 0.7);
+    font-size : .9rem;
+    margin-top: 1rem;
+}
