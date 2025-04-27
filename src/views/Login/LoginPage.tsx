@@ -41,7 +41,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ setIsLoggedIn }) => {
 
   return (
     <div className="mainLayout">
-      <div className="leftSection">
+      <div className="leftSection" style={{ minWidth: "unset" }}>
         <div className={styles.loginContainer}>
           {/* Apply fade effect only to the content inside */}
           <div

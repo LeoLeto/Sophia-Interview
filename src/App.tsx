@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"; // 👈 added
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import LoginPage from "./views/Login/LoginPage";
 import MainLayout from "./views/MainLayout";
 import "./App.css";
