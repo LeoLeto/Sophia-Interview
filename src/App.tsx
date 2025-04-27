@@ -1,15 +1,37 @@
 import { useState } from "react";
-import LoginPage from "./views/LoginPage";
-import MainLayout from "./views/MainLayout"; // your App content moved here
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"; // 👈 added
+import LoginPage from "./views/Login/LoginPage";
+import MainLayout from "./views/MainLayout";
 import "./App.css";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  return isLoggedIn ? (
-    <MainLayout setIsLoggedIn={setIsLoggedIn} />
-  ) : (
-    <LoginPage setIsLoggedIn={setIsLoggedIn} />
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            isLoggedIn ? (
+              <Navigate to="/dashboard" replace />
+            ) : (
+              <LoginPage setIsLoggedIn={setIsLoggedIn} />
+            )
+          }
+        />
+        <Route
+          path="/dashboard"
+          element={
+            isLoggedIn ? (
+              <MainLayout setIsLoggedIn={setIsLoggedIn} />
+            ) : (
+              <Navigate to="/" replace />
+            )
+          }
+        />
+      </Routes>
+    </BrowserRouter>
   );
 }
 

@@ -11,7 +11,8 @@
 }
 
 .formGroup {
-    margin-bottom: 15px;
+    margin-top   : 1rem;
+    margin-bottom: 1.5rem;
 }
 
 .formGroup label {
@@ -20,7 +21,7 @@
 }
 
 .formGroup input {
-    width        : 100%;
+    width     : 100%;
     margin-top: 1rem;
 }
 
@@ -35,4 +36,20 @@
     color     : rgba(255, 0, 0, 0.7);
     font-size : .9rem;
     margin-top: 1rem;
+}
+
+.toggleLink {
+    margin-top: 1.5rem;
+}
+
+/* Fade transition for the content */
+.loginContent {
+    opacity   : 0;
+    transition: opacity 0.2s;
+    /* Faster transition */
+}
+
+/* When the component is loaded or switched, we fade it in */
+.loginContent.show {
+    opacity: 1;
 }
