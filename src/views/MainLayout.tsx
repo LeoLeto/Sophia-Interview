@@ -1,4 +1,3 @@
-// MainLayout.tsx
 import { useState } from "react";
 import { Chatbox } from "../components/Chatbox";
 import { Messages } from "../components/Messages";
@@ -14,19 +13,29 @@ function MainLayout({ setIsLoggedIn }: MainLayoutProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
   const [inputValue, setInputValue] = useState<string>("");
-
+  const [isSpeechEnabled, setIsSpeechEnabled] = useState<boolean>(false);
+  
   const handleLogout = () => {
     setIsLoggedIn(false);
   };
 
   const handleSend = async (newMessage: string) => {
-    await handleSendMessage(newMessage, messages, setMessages, setLoading);
+    await handleSendMessage(
+      newMessage,
+      messages,
+      setMessages,
+      setLoading,
+      isSpeechEnabled
+    );
   };
 
   return (
     <div className="mainLayout">
       <span className="leftSection">
-        <Avatar />
+        <Avatar
+          isSpeechEnabled={isSpeechEnabled}
+          setIsSpeechEnabled={setIsSpeechEnabled}
+        />
         <p className="welcomeLabel">Bienvenido, Juan Doe</p>
         <button>Iniciar</button>
         <button className="logoutButton" onClick={handleLogout}>

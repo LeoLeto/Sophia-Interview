@@ -7,7 +7,6 @@ type ChatboxProps = {
   loading: boolean;
 };
 
-// Define minimal types needed
 interface SpeechRecognitionType extends EventTarget {
   lang: string;
   continuous: boolean;
@@ -60,9 +59,9 @@ export function Chatbox({
   };
 
   const recognitionRef = useRef<SpeechRecognitionType | null>(null);
-  const [isListening, setIsListening] = useState(false);
+  const [listening, setListening] = useState(false);
 
-  const startListening = () => {
+  const handleStartDictation = () => {
     if (!SpeechRecognitionClass) {
       alert("Tu navegador no soporta reconocimiento de voz.");
       return;
@@ -81,12 +80,19 @@ export function Chatbox({
       };
 
       recognitionRef.current.onend = () => {
-        setIsListening(false);
+        setListening(false);
       };
     }
 
-    setIsListening(true);
     recognitionRef.current.start();
+    setListening(true);
+  };
+
+  const handleStopDictation = () => {
+    if (recognitionRef.current) {
+      recognitionRef.current.stop();
+      setListening(false);
+    }
   };
 
   return (
@@ -99,9 +105,15 @@ export function Chatbox({
         placeholder="Escribe aquí tu mensaje..."
         disabled={loading}
       />
-      <button onClick={startListening} disabled={isListening || loading}>
-        {isListening ? "🎙️ Grabando..." : "🎤"}
+
+      <button
+        onClick={listening ? handleStopDictation : handleStartDictation}
+        className={`micButton ${listening ? "listening" : ""}`}
+        disabled={loading}
+      >
+        🎤
       </button>
+      
       <button onClick={handleSend} disabled={loading}>
         {loading ? "..." : "Enviar"}
       </button>

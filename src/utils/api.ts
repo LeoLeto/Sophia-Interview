@@ -1,13 +1,15 @@
 import { Message } from "../types";
 
 export const fetchBotResponse = async (
-  messages: Message[]
-): Promise<string> => {
+  messages: Message[],
+  isSpeechEnabled: boolean // Add isSpeechEnabled as an argument
+): Promise<{ message: string; audioUrl: string | null }> => {
   const payload = {
     messages: messages.map((msg) => ({
       role: msg.sender === "user" ? "user" : "assistant",
       content: msg.text,
     })),
+    isSpeechEnabled, // Send isSpeechEnabled to the API
   };
 
   const res = await fetch(import.meta.env.VITE_API_URL + "Gpt4", {
@@ -22,5 +24,8 @@ export const fetchBotResponse = async (
     throw new Error("Error fetching response");
   }
 
-  return data.message;
+  return {
+    message: data.message,
+    audioUrl: data.audioUrl || null, // If no audioUrl, return null
+  };
 };
