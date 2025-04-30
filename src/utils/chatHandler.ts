@@ -1,4 +1,4 @@
-import { Message } from "../types";
+import { GptFormData, Message } from "../types";
 import { fetchBotResponse } from "../utils/api";
 
 export const handleSendMessage = async (
@@ -6,7 +6,10 @@ export const handleSendMessage = async (
   currentMessages: Message[],
   setMessages: React.Dispatch<React.SetStateAction<Message[]>>,
   setLoading: React.Dispatch<React.SetStateAction<boolean>>,
-  isSpeechEnabled: boolean
+  isSpeechEnabled: boolean,
+  formData: GptFormData,
+  setFormData: React.Dispatch<React.SetStateAction<GptFormData>>,
+  taskInProgress: string
 ) => {
   const userMsg: Message = { sender: "user", text: newMessage };
 
@@ -14,13 +17,20 @@ export const handleSendMessage = async (
   setLoading(true);
 
   try {
-    const { message, audioUrl } = await fetchBotResponse(
+    const { message, audioUrl, formDataUpdate } = await fetchBotResponse(
       [...currentMessages, userMsg],
-      isSpeechEnabled
+      isSpeechEnabled,
+      formData,
+      taskInProgress
     );
 
     const botMsg: Message = { sender: "bot", text: message };
     setMessages((prev) => [...prev, botMsg]);
+
+    // Apply updates to formData
+    if (formDataUpdate) {
+      setFormData((prev) => ({ ...prev, ...formDataUpdate }));
+    }
 
     // Only speak the response if speech is enabled and audioUrl is present
     if (isSpeechEnabled && audioUrl) {

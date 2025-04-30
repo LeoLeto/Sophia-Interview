@@ -173,6 +173,24 @@ button:hover {
     animation: pulse 1.5s infinite;
 }
 
+.formDataSummary {
+    background-color: #ffffff22;
+    backdrop-filter : blur(6px);
+    border-radius   : 1rem;
+    padding         : 1rem;
+    margin-top      : 1rem;
+    color           : #000;
+}
+
+.formDataSummary h4 {
+    margin-bottom: 0.5rem;
+}
+
+.formDataSummary li {
+    margin-bottom: 0.25rem;
+}
+
+
 @keyframes pulse {
     0% {
         transform: scale(1);
