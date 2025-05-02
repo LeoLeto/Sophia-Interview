@@ -29,7 +29,7 @@ export const fetchBotResponse = async (
 
   const data = await res.json();
 
-  // console.log(" data: ", data);
+  console.log(" data: ", data);
 
   if (!res.ok || !data.message) {
     throw new Error("Error fetching response");

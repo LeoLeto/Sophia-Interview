@@ -13,6 +13,7 @@ export const handleSendMessage = async (
 ) => {
   const userMsg: Message = { sender: "user", text: newMessage };
 
+  // Add user message to the message state
   setMessages((prev) => [...prev, userMsg]);
   setLoading(true);
 
@@ -27,9 +28,12 @@ export const handleSendMessage = async (
 
     console.log(" updatedMessages: ", updatedMessages);
 
-    // Use updatedMessages if present
+    // Initialize the messages array that will be updated
+    let newBotMessages: Message[] = [];
+
+    // If there are updatedMessages, filter and map them to the expected format
     if (updatedMessages?.length) {
-      const newBotMessages: Message[] = updatedMessages
+      newBotMessages = updatedMessages
         .filter(
           (msg) =>
             msg.role === "assistant" &&
@@ -40,13 +44,27 @@ export const handleSendMessage = async (
           sender: "bot",
           text: msg.content!,
         }));
-
-      setMessages((prev) => [...prev, ...newBotMessages]);
-    } else {
-      setMessages((prev) => [...prev, { sender: "bot", text: message }]);
     }
 
-    // Apply updates to formData
+    // If no updatedMessages, fallback to just the message from the API
+    if (!newBotMessages.length && message?.trim()) {
+      newBotMessages.push({ sender: "bot", text: message });
+    }
+
+    // Check for duplicates before appending
+    const newMessages = newBotMessages.filter(
+      (msg) =>
+        !currentMessages.some(
+          (m) => m.text === msg.text && m.sender === msg.sender
+        )
+    );
+
+    // Add the new bot messages to the state only if they are not duplicates
+    if (newMessages.length) {
+      setMessages((prev) => [...prev, ...newMessages]);
+    }
+
+    // Apply updates to formData if any
     if (formDataUpdate) {
       setFormData((prev) => ({ ...prev, ...formDataUpdate }));
     }
@@ -57,7 +75,8 @@ export const handleSendMessage = async (
       const audio = new Audio(audioUrl);
       audio.play();
     }
-  } catch {
+  } catch (error) {
+    console.log(" error: ", error);
     const errorMsg: Message = {
       sender: "bot",
       text: "Lo siento, ocurrió un error al responder.",
