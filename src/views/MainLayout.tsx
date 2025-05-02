@@ -20,6 +20,7 @@ function MainLayout({ setIsLoggedIn }: MainLayoutProps) {
   const [inputValue, setInputValue] = useState<string>("");
   const [isSpeechEnabled, setIsSpeechEnabled] = useState<boolean>(false);
   const [showSummary, setShowSummary] = useState(false);
+  const [isChatInitiated, setIsChatInitiated] = useState<boolean>(false);
 
   const [formData, setFormData] = useState<GptFormData>({
     name: null,
@@ -34,6 +35,10 @@ function MainLayout({ setIsLoggedIn }: MainLayoutProps) {
 
   const handleLogout = () => {
     setIsLoggedIn(false);
+  };
+
+  const handleInitiateChat = () => {
+    setIsChatInitiated(true);
   };
 
   const handleSend = async (newMessage: string) => {
@@ -74,8 +79,18 @@ function MainLayout({ setIsLoggedIn }: MainLayoutProps) {
           isSpeechEnabled={isSpeechEnabled}
           setIsSpeechEnabled={setIsSpeechEnabled}
         />
-        <p className="welcomeLabel">Bienvenido, Juan Doe</p>
-        <button>Iniciar</button>
+        {formData.name ? (
+          <p className="welcomeLabel">Bienvenido, {formData.name}</p>
+        ) : (
+          <p className="welcomeLabel">Bienvenido</p>
+        )}
+        <button
+          className={`${isChatInitiated ? "disabled" : ""}`}
+          onClick={handleInitiateChat}
+          disabled={isChatInitiated}
+        >
+          Iniciar
+        </button>
         <button onClick={() => setShowSummary(true)}>Ver resumen</button>
         <button className="logoutButton" onClick={handleLogout}>
           Cerrar sesión
@@ -84,7 +99,7 @@ function MainLayout({ setIsLoggedIn }: MainLayoutProps) {
       <span className="rightSection">
         {messages.length === 0 && (
           <div className="initialHelperMessage">
-            💬 Envía un mensaje para iniciar la conversación
+            💬 Haz click en Iniciar para comenzar tu entrevista
           </div>
         )}
         <Messages messages={messages} />
@@ -94,6 +109,7 @@ function MainLayout({ setIsLoggedIn }: MainLayoutProps) {
           inputValue={inputValue}
           setInputValue={setInputValue}
           loading={loading}
+          isChatInitiated={isChatInitiated}
         />
       </span>
 

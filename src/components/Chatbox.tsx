@@ -5,6 +5,7 @@ type ChatboxProps = {
   inputValue: string;
   setInputValue: (value: string) => void;
   loading: boolean;
+  isChatInitiated: boolean;
 };
 
 interface SpeechRecognitionType extends EventTarget {
@@ -40,6 +41,7 @@ export function Chatbox({
   inputValue,
   setInputValue,
   loading,
+  isChatInitiated,
 }: ChatboxProps) {
   const handleSend = () => {
     if (inputValue.trim() !== "") {
@@ -96,25 +98,25 @@ export function Chatbox({
   };
 
   return (
-    <div className="chatboxContainer">
+    <div className={`chatboxContainer ${!isChatInitiated ? "disabled" : ""}`}>
       <input
         type="text"
         value={inputValue}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
         placeholder="Escribe aquí tu mensaje..."
-        disabled={loading}
+        disabled={loading || !isChatInitiated}
       />
 
       <button
         onClick={listening ? handleStopDictation : handleStartDictation}
         className={`micButton ${listening ? "listening" : ""}`}
-        disabled={loading}
+        disabled={loading || !isChatInitiated}
       >
         🎤
       </button>
-      
-      <button onClick={handleSend} disabled={loading}>
+
+      <button onClick={handleSend} disabled={loading || !isChatInitiated}>
         {loading ? "..." : "Enviar"}
       </button>
     </div>
