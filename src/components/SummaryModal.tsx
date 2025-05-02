@@ -1,0 +1,59 @@
+import React from "react";
+import { GptFormData } from "../types";
+
+interface SummaryModalProps {
+  formData: GptFormData;
+  taskInProgress: string;
+  onClose: () => void;
+}
+
+const SummaryModal: React.FC<SummaryModalProps> = ({
+  formData,
+  taskInProgress,
+  onClose,
+}) => {
+  return (
+    <div className="modalOverlay">
+      <div className="modalContent">
+        <button className="closeButton" onClick={onClose}>
+          ✖
+        </button>
+        <h2>Resumen de la entrevista</h2>
+
+        <h3>Identidad del usuario</h3>
+        <ul>
+          <li>
+            <strong>Nombre:</strong> {formData.name || "Pendiente"}
+          </li>
+          <li>
+            <strong>Cargo:</strong> {formData.position || "Pendiente"}
+          </li>
+        </ul>
+
+        <h3>Tarea en curso</h3>
+        <ul>
+          <li>
+            <strong>Nombre de la tarea:</strong> {taskInProgress || "Pendiente"}
+          </li>
+          <li>
+            <strong>Frecuencia y tiempo:</strong>{" "}
+            {formData.frequencyAndTime || "Pendiente"}
+          </li>
+          <li>
+            <strong>Dificultad:</strong> {formData.difficulty || "Pendiente"}
+          </li>
+          <li>
+            <strong>Valor agregado:</strong>{" "}
+            {formData.addedValue || "Pendiente"}
+          </li>
+          <li>
+            <strong>Priorización implícita:</strong>{" "}
+            {formData.implicitPriority || "Pendiente"}
+          </li>
+        </ul>
+      </div>
+    </div>
+  );
+};
+
+export default SummaryModal;

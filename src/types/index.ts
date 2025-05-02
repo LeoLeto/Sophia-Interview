@@ -4,6 +4,8 @@ export type Message = {
 };
 
 export type GptFormData = {
+  name: string | null;
+  position: string | null;
   frequencyAndTime: string | null;
   difficulty: string | null;
   addedValue: string | null;

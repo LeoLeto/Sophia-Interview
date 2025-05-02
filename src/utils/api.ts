@@ -9,6 +9,7 @@ export const fetchBotResponse = async (
   message: string;
   audioUrl: string | null;
   formDataUpdate: Partial<GptFormData> | null;
+  updatedMessages?: { role: string; content?: string }[] | null;
 }> => {
   const payload = {
     messages: messages.map((msg) => ({
@@ -28,6 +29,8 @@ export const fetchBotResponse = async (
 
   const data = await res.json();
 
+  // console.log(" data: ", data);
+
   if (!res.ok || !data.message) {
     throw new Error("Error fetching response");
   }
@@ -36,5 +39,6 @@ export const fetchBotResponse = async (
     message: data.message,
     audioUrl: data.audioUrl || null, // If no audioUrl, return null
     formDataUpdate: data.formDataUpdate || null,
+    updatedMessages: data.updatedMessages,
   };
 };

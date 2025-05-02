@@ -17,15 +17,34 @@ export const handleSendMessage = async (
   setLoading(true);
 
   try {
-    const { message, audioUrl, formDataUpdate } = await fetchBotResponse(
-      [...currentMessages, userMsg],
-      isSpeechEnabled,
-      formData,
-      taskInProgress
-    );
+    const { message, audioUrl, formDataUpdate, updatedMessages } =
+      await fetchBotResponse(
+        [...currentMessages, userMsg],
+        isSpeechEnabled,
+        formData,
+        taskInProgress
+      );
 
-    const botMsg: Message = { sender: "bot", text: message };
-    setMessages((prev) => [...prev, botMsg]);
+    console.log(" updatedMessages: ", updatedMessages);
+
+    // Use updatedMessages if present
+    if (updatedMessages?.length) {
+      const newBotMessages: Message[] = updatedMessages
+        .filter(
+          (msg) =>
+            msg.role === "assistant" &&
+            typeof msg.content === "string" &&
+            msg.content.trim().length > 0
+        )
+        .map((msg) => ({
+          sender: "bot",
+          text: msg.content!,
+        }));
+
+      setMessages((prev) => [...prev, ...newBotMessages]);
+    } else {
+      setMessages((prev) => [...prev, { sender: "bot", text: message }]);
+    }
 
     // Apply updates to formData
     if (formDataUpdate) {

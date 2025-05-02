@@ -1,10 +1,14 @@
 import { useState } from "react";
+import Avatar from "../components/Avatar";
 import { Chatbox } from "../components/Chatbox";
 import { Messages } from "../components/Messages";
 import { GptFormData, Message } from "../types";
 import { handleSendMessage } from "../utils/chatHandler";
-import Avatar from "../components/Avatar";
-import { isFormDataComplete } from "../utils/isFormDataComplete";
+import {
+  isIdentityComplete,
+  isTaskFormComplete,
+} from "../utils/isFormDataComplete";
+import SummaryModal from "../components/SummaryModal";
 
 interface MainLayoutProps {
   setIsLoggedIn: (value: boolean) => void;
@@ -15,8 +19,11 @@ function MainLayout({ setIsLoggedIn }: MainLayoutProps) {
   const [loading, setLoading] = useState(false);
   const [inputValue, setInputValue] = useState<string>("");
   const [isSpeechEnabled, setIsSpeechEnabled] = useState<boolean>(false);
+  const [showSummary, setShowSummary] = useState(false);
 
   const [formData, setFormData] = useState<GptFormData>({
+    name: null,
+    position: null,
     frequencyAndTime: null,
     difficulty: null,
     addedValue: null,
@@ -42,16 +49,21 @@ function MainLayout({ setIsLoggedIn }: MainLayoutProps) {
     );
 
     // If task is defined and form is complete, reset for next task
-    if (taskInProgress && isFormDataComplete(formData)) {
+    if (
+      taskInProgress &&
+      isTaskFormComplete(formData) &&
+      isIdentityComplete(formData)
+    ) {
       setTimeout(() => {
-        setTaskInProgress(""); // Clear task
-        setFormData({
+        setTaskInProgress("");
+        setFormData((prev) => ({
+          ...prev,
           frequencyAndTime: null,
           difficulty: null,
           addedValue: null,
           implicitPriority: null,
-        });
-      }, 1500); // Delay reset so user sees wrap-up message
+        }));
+      }, 1500);
     }
   };
 
@@ -64,6 +76,7 @@ function MainLayout({ setIsLoggedIn }: MainLayoutProps) {
         />
         <p className="welcomeLabel">Bienvenido, Juan Doe</p>
         <button>Iniciar</button>
+        <button onClick={() => setShowSummary(true)}>Ver resumen</button>
         <button className="logoutButton" onClick={handleLogout}>
           Cerrar sesión
         </button>
@@ -84,34 +97,12 @@ function MainLayout({ setIsLoggedIn }: MainLayoutProps) {
         />
       </span>
 
-      {Object.values(formData).some((value) => value !== null) && (
-        <div className="formDataSummary">
-          <h4>Información recopilada:</h4>
-          <ul>
-            {formData.frequencyAndTime && (
-              <li>
-                <strong>Frecuencia y tiempo:</strong>{" "}
-                {formData.frequencyAndTime}
-              </li>
-            )}
-            {formData.difficulty && (
-              <li>
-                <strong>Dificultad:</strong> {formData.difficulty}
-              </li>
-            )}
-            {formData.addedValue && (
-              <li>
-                <strong>Valor agregado:</strong> {formData.addedValue}
-              </li>
-            )}
-            {formData.implicitPriority && (
-              <li>
-                <strong>Priorización implícita:</strong>{" "}
-                {formData.implicitPriority}
-              </li>
-            )}
-          </ul>
-        </div>
+      {showSummary && (
+        <SummaryModal
+          formData={formData}
+          taskInProgress={taskInProgress}
+          onClose={() => setShowSummary(false)}
+        />
       )}
     </div>
   );
