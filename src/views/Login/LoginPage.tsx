@@ -70,6 +70,11 @@ const LoginPage: React.FC<LoginPageProps> = ({ setIsLoggedIn }) => {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Ingrese su contraseña"
                 disabled={loading}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleSubmit();
+                  }
+                }}
               />
             </div>
 

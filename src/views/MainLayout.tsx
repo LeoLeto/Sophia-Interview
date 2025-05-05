@@ -10,6 +10,7 @@ import {
 } from "../utils/isFormDataComplete";
 import SummaryModal from "../components/SummaryModal";
 import { startInterview } from "../utils/startInterview";
+import { getGenderedGreeting } from "../utils/getGenderedGreeting";
 
 interface MainLayoutProps {
   setIsLoggedIn: (value: boolean) => void;
@@ -96,10 +97,11 @@ function MainLayout({ setIsLoggedIn }: MainLayoutProps) {
           setIsSpeechEnabled={setIsSpeechEnabled}
         />
         {formData.name ? (
-          <p className="welcomeLabel">Bienvenido, {formData.name}</p>
+          <p className="welcomeLabel">{getGenderedGreeting(formData.name)}</p>
         ) : (
           <p className="welcomeLabel">Bienvenido</p>
         )}
+
         <button
           className={`${isChatInitiated ? "disabled" : ""}`}
           onClick={handleInitiateChat}
