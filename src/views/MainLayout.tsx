@@ -9,6 +9,7 @@ import {
   isTaskFormComplete,
 } from "../utils/isFormDataComplete";
 import SummaryModal from "../components/SummaryModal";
+import { startInterview } from "../utils/startInterview";
 
 interface MainLayoutProps {
   setIsLoggedIn: (value: boolean) => void;
@@ -38,8 +39,22 @@ function MainLayout({ setIsLoggedIn }: MainLayoutProps) {
     setIsLoggedIn(false);
   };
 
-  const handleInitiateChat = () => {
+  const handleInitiateChat = async () => {
     setIsChatInitiated(true);
+    setLoading(true);
+
+    const initialBotMessage = await startInterview(
+      isSpeechEnabled,
+      formData,
+      taskInProgress
+    );
+
+    setMessages((prev) => [
+      ...prev,
+      { sender: "bot", text: initialBotMessage.message },
+    ]);
+
+    setLoading(false);
   };
 
   const handleSend = async (newMessage: string) => {
