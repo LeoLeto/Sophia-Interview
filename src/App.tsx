@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import LoginPage from "./views/Login/LoginPage";
 import MainLayout from "./views/MainLayout";
@@ -6,6 +6,13 @@ import "./App.css";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const userData = localStorage.getItem("user");
+    if (userData) {
+      setIsLoggedIn(true);
+    }
+  }, []);
 
   return (
     <BrowserRouter>

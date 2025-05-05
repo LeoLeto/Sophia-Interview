@@ -34,6 +34,7 @@ function MainLayout({ setIsLoggedIn }: MainLayoutProps) {
   const [taskInProgress, setTaskInProgress] = useState<string>("");
 
   const handleLogout = () => {
+    localStorage.removeItem("user");
     setIsLoggedIn(false);
   };
 
