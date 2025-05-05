@@ -1,5 +1,5 @@
 import { fetchBotResponse } from "./api";
-import { GptFormData, Message } from "../types";
+import { GptFormData, ChatMessage } from "../types";
 
 export const startInterview = async (
   isSpeechEnabled: boolean,
@@ -8,18 +8,18 @@ export const startInterview = async (
 ): Promise<{
   message: string;
   formDataUpdate: Partial<GptFormData> | null;
-  updatedMessages?: { role: string; content?: string }[] | null;
+  messageHistory?: { role: string; content?: string }[] | null;
 }> => {
-  const initialMessage: Message = {
-    sender: "user",
-    text: "Hola",
+  const initialMessage: ChatMessage = {
+    role: "user",
+    content: "Hola",
   };
 
   try {
     const {
       message: botMessage,
       formDataUpdate,
-      updatedMessages,
+      messageHistory,
     } = await fetchBotResponse(
       [initialMessage],
       isSpeechEnabled,
@@ -30,14 +30,14 @@ export const startInterview = async (
     return {
       message: botMessage,
       formDataUpdate,
-      updatedMessages,
+      messageHistory,
     };
   } catch (error) {
     console.error("Error starting interview:", error);
     return {
       message: "Lo siento, ocurrió un error al iniciar la entrevista.",
       formDataUpdate: null,
-      updatedMessages: null,
+      messageHistory: null,
     };
   }
 };

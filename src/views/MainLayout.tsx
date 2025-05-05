@@ -2,7 +2,7 @@ import { useState } from "react";
 import Avatar from "../components/Avatar";
 import { Chatbox } from "../components/Chatbox";
 import { Messages } from "../components/Messages";
-import { GptFormData, Message } from "../types";
+import { GptFormData, ChatMessage } from "../types";
 import { handleSendMessage } from "../utils/chatHandler";
 import {
   isIdentityComplete,
@@ -17,7 +17,7 @@ interface MainLayoutProps {
 }
 
 function MainLayout({ setIsLoggedIn }: MainLayoutProps) {
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState(false);
   const [inputValue, setInputValue] = useState<string>("");
   const [isSpeechEnabled, setIsSpeechEnabled] = useState<boolean>(false);
@@ -52,7 +52,7 @@ function MainLayout({ setIsLoggedIn }: MainLayoutProps) {
 
     setMessages((prev) => [
       ...prev,
-      { sender: "bot", text: initialBotMessage.message },
+      { role: "assistant", content: initialBotMessage.message },
     ]);
 
     setLoading(false);
@@ -115,7 +115,7 @@ function MainLayout({ setIsLoggedIn }: MainLayoutProps) {
         </button>
       </span>
       <span className="rightSection">
-        {messages.length === 0 && (
+        {!isChatInitiated && (
           <div className="initialHelperMessage">
             💬 Haz click en Iniciar para comenzar tu entrevista
           </div>

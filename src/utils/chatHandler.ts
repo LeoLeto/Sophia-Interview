@@ -1,24 +1,24 @@
-import { GptFormData, Message } from "../types";
+import { GptFormData, ChatMessage } from "../types";
 import { fetchBotResponse } from "../utils/api";
 
 export const handleSendMessage = async (
   newMessage: string,
-  currentMessages: Message[],
-  setMessages: React.Dispatch<React.SetStateAction<Message[]>>,
+  currentMessages: ChatMessage[],
+  setMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>,
   setLoading: React.Dispatch<React.SetStateAction<boolean>>,
   isSpeechEnabled: boolean,
   formData: GptFormData,
   setFormData: React.Dispatch<React.SetStateAction<GptFormData>>,
   taskInProgress: string
 ) => {
-  const userMsg: Message = { sender: "user", text: newMessage };
+  const userMsg: ChatMessage = { role: "user", content: newMessage };
 
   // Add user message to the message state
   setMessages((prev) => [...prev, userMsg]);
   setLoading(true);
 
   try {
-    const { message, audioUrl, formDataUpdate, updatedMessages } =
+    const { message, audioUrl, formDataUpdate, messageHistory } =
       await fetchBotResponse(
         [...currentMessages, userMsg],
         isSpeechEnabled,
@@ -26,14 +26,15 @@ export const handleSendMessage = async (
         taskInProgress
       );
 
-    console.log(" updatedMessages: ", updatedMessages);
+    console.log(" message: ", message);
+    // console.log(" messageHistory: ", messageHistory);
 
     // Initialize the messages array that will be updated
-    let newBotMessages: Message[] = [];
+    let newBotMessages: ChatMessage[] = [];
 
-    // If there are updatedMessages, filter and map them to the expected format
-    if (updatedMessages?.length) {
-      newBotMessages = updatedMessages
+    // If there is messageHistory, filter and map them to the expected format
+    if (messageHistory?.length) {
+      newBotMessages = messageHistory
         .filter(
           (msg) =>
             msg.role === "assistant" &&
@@ -41,27 +42,23 @@ export const handleSendMessage = async (
             msg.content.trim().length > 0
         )
         .map((msg) => ({
-          sender: "bot",
-          text: msg.content!,
+          role: "assistant",
+          content: msg.content!,
         }));
-    }
-
-    // If no updatedMessages, fallback to just the message from the API
-    if (!newBotMessages.length && message?.trim()) {
-      newBotMessages.push({ sender: "bot", text: message });
+      console.log(" newBotMessages: ", newBotMessages);
     }
 
     // Check for duplicates before appending
-    const newMessages = newBotMessages.filter(
+    const filteredNewMessages = newBotMessages.filter(
       (msg) =>
         !currentMessages.some(
-          (m) => m.text === msg.text && m.sender === msg.sender
+          (m) => m.content === msg.content && m.role === msg.role
         )
     );
 
     // Add the new bot messages to the state only if they are not duplicates
-    if (newMessages.length) {
-      setMessages((prev) => [...prev, ...newMessages]);
+    if (filteredNewMessages.length) {
+      setMessages((prev) => [...prev, ...filteredNewMessages]);
     }
 
     // Apply updates to formData if any
@@ -71,15 +68,14 @@ export const handleSendMessage = async (
 
     // Only speak the response if speech is enabled and audioUrl is present
     if (isSpeechEnabled && audioUrl) {
-      console.log("THIS RUNS");
       const audio = new Audio(audioUrl);
       audio.play();
     }
   } catch (error) {
     console.log(" error: ", error);
-    const errorMsg: Message = {
-      sender: "bot",
-      text: "Lo siento, ocurrió un error al responder.",
+    const errorMsg: ChatMessage = {
+      role: "assistant",
+      content: "Lo siento, ocurrió un error al responder.",
     };
     setMessages((prev) => [...prev, errorMsg]);
   } finally {

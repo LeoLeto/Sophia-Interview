@@ -1,6 +1,6 @@
-export type Message = {
-  sender: "user" | "bot";
-  text: string;
+export type ChatMessage = {
+  role: "user" | "assistant";
+  content: string;
 };
 
 export type GptFormData = {

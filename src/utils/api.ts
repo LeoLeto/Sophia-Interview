@@ -1,7 +1,7 @@
-import { GptFormData, Message } from "../types";
+import { GptFormData, ChatMessage } from "../types";
 
 export const fetchBotResponse = async (
-  messages: Message[],
+  messages: ChatMessage[],
   isSpeechEnabled: boolean, // Add isSpeechEnabled as an argument
   formData: GptFormData,
   taskInProgress: string
@@ -9,12 +9,12 @@ export const fetchBotResponse = async (
   message: string;
   audioUrl: string | null;
   formDataUpdate: Partial<GptFormData> | null;
-  updatedMessages?: { role: string; content?: string }[] | null;
+  messageHistory?: { role: string; content?: string }[] | null;
 }> => {
   const payload = {
     messages: messages.map((msg) => ({
-      role: msg.sender === "user" ? "user" : "assistant",
-      content: msg.text,
+      role: msg.role === "user" ? "user" : "assistant",
+      content: msg.content    ,
     })),
     isSpeechEnabled,
     formData,
@@ -28,6 +28,8 @@ export const fetchBotResponse = async (
   });
 
   const data = await res.json();
+  const message = data.message;
+  let messageHistory: ChatMessage[] = data.messageHistory;
 
   console.log(" data: ", data);
 
@@ -35,10 +37,24 @@ export const fetchBotResponse = async (
     throw new Error("Error fetching response");
   }
 
+  // Ensure latest assistant message is included in messageHistory
+  if (
+    data.message &&
+    (!data.messageHistory?.length ||
+      !messageHistory.some(
+        (m) => m.role === "assistant" && m.content?.trim() === message.trim()
+      ))
+  ) {
+    messageHistory = [
+      ...(messageHistory || []),
+      { role: "assistant", content: message },
+    ];
+  }
+
   return {
     message: data.message,
     audioUrl: data.audioUrl || null, // If no audioUrl, return null
     formDataUpdate: data.formDataUpdate || null,
-    updatedMessages: data.updatedMessages,
+    messageHistory: messageHistory,
   };
 };

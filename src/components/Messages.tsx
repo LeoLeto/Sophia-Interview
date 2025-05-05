@@ -1,17 +1,14 @@
-type Message = {
-  sender: "user" | "bot";
-  text: string;
-};
+import { ChatMessage } from "../types";
 
-export function Messages({ messages }: { messages: Message[] }) {
+export function Messages({ messages }: { messages: ChatMessage[] }) {
   return (
     <div className="messagesContainer">
       {messages.map((msg, idx) => (
         <div
           key={idx}
-          className={msg.sender === "user" ? "userMessage" : "botMessage"}
+          className={msg.role === "user" ? "userMessage" : "botMessage"}
         >
-          {msg.text}
+          {msg.content}
         </div>
       ))}
     </div>
