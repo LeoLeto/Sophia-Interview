@@ -54,14 +54,11 @@ export const fetchBotResponse = async (
 
   console.log("taskInProgress in fetchBotResponse:", taskInProgress);
 
-  const wrappedFormDataUpdate =
-    data.formDataUpdate && taskInProgress
-      ? {
-          tasks: {
-            [taskInProgress]: data.formDataUpdate,
-          },
-        }
-      : null;
+  const wrappedFormDataUpdate = data.formDataUpdate?.tasks
+    ? {
+        tasks: data.formDataUpdate.tasks,
+      }
+    : null;
 
   return {
     message: data.message,

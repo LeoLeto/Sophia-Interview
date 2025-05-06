@@ -2,15 +2,11 @@ import { useEffect, useState } from "react";
 import Avatar from "../components/Avatar";
 import { Chatbox } from "../components/Chatbox";
 import { Messages } from "../components/Messages";
-import { GptFormData, ChatMessage } from "../types";
-import { handleSendMessage } from "../utils/chatHandler";
-import {
-  isIdentityComplete,
-  isTaskFormComplete,
-} from "../utils/isFormDataComplete";
 import SummaryModal from "../components/SummaryModal";
-import { startInterview } from "../utils/startInterview";
+import { ChatMessage, GptFormData } from "../types";
+import { handleSendMessage } from "../utils/chatHandler";
 import { getGenderedGreeting } from "../utils/getGenderedGreeting";
+import { startInterview } from "../utils/startInterview";
 
 interface MainLayoutProps {
   setIsLoggedIn: (value: boolean) => void;
@@ -23,6 +19,7 @@ function MainLayout({ setIsLoggedIn }: MainLayoutProps) {
   const [isSpeechEnabled, setIsSpeechEnabled] = useState<boolean>(false);
   const [showSummary, setShowSummary] = useState(false);
   const [isChatInitiated, setIsChatInitiated] = useState<boolean>(false);
+  const [taskInProgress, setTaskInProgress] = useState<string>("");
 
   const [formData, setFormData] = useState<GptFormData>({
     name: null,
@@ -33,8 +30,6 @@ function MainLayout({ setIsLoggedIn }: MainLayoutProps) {
   useEffect(() => {
     console.log("formData:", formData);
   }, [formData]);
-
-  const [taskInProgress, setTaskInProgress] = useState<string>("");
 
   const handleLogout = () => {
     localStorage.removeItem("user");
@@ -64,20 +59,9 @@ function MainLayout({ setIsLoggedIn }: MainLayoutProps) {
       isSpeechEnabled,
       formData,
       setFormData,
-      taskInProgress
+      taskInProgress,
+      setTaskInProgress
     );
-
-    // If task is defined and form is complete, reset for next task
-    if (
-      taskInProgress &&
-      formData.tasks[taskInProgress] &&
-      isTaskFormComplete(formData, taskInProgress) &&
-      isIdentityComplete(formData)
-    ) {
-      setTimeout(() => {
-        setTaskInProgress("");
-      }, 1500);
-    }
   };
 
   return (

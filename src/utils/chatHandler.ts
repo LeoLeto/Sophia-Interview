@@ -1,5 +1,6 @@
 import { GptFormData, ChatMessage } from "../types";
 import { fetchBotResponse } from "./fetchBotResponse";
+import { mergeFormDataUpdate } from "./mergeFormDataUpdate";
 
 export const handleSendMessage = async (
   newMessage: string,
@@ -9,45 +10,32 @@ export const handleSendMessage = async (
   isSpeechEnabled: boolean,
   formData: GptFormData,
   setFormData: React.Dispatch<React.SetStateAction<GptFormData>>,
-  taskInProgress: keyof GptFormData["tasks"] // Ensure taskInProgress is a valid key of tasks
+  taskInProgress: keyof GptFormData["tasks"],
+  setTaskInProgress: (taskKey: string) => void
 ) => {
   const userMsg: ChatMessage = { role: "user", content: newMessage };
 
-  // Add user message to the message state
   setMessages((prev) => [...prev, userMsg]);
   setLoading(true);
 
   try {
-    const {
-      message,
-      audioUrl,
-      formDataUpdate,
-      identityUpdate,
-      messageHistory,
-    } = await fetchBotResponse(
-      [...currentMessages, userMsg],
-      isSpeechEnabled,
-      formData,
-      taskInProgress
-    );
+    const { audioUrl, formDataUpdate, identityUpdate, messageHistory } =
+      await fetchBotResponse(
+        [...currentMessages, userMsg],
+        isSpeechEnabled,
+        formData,
+        taskInProgress
+      );
 
-    console.log(" message: ", message);
-
-    // Process any assistant message history
-    let newBotMessages: ChatMessage[] = [];
-    if (messageHistory?.length) {
-      newBotMessages = messageHistory
-        .filter(
-          (msg) =>
-            msg.role === "assistant" &&
-            typeof msg.content === "string" &&
-            msg.content.trim().length > 0
-        )
-        .map((msg) => ({
-          role: "assistant",
-          content: msg.content!,
-        }));
-    }
+    // Process assistant messages from history
+    const newBotMessages: ChatMessage[] = (messageHistory || [])
+      .filter(
+        (msg) =>
+          msg.role === "assistant" &&
+          typeof msg.content === "string" &&
+          msg.content.trim().length > 0
+      )
+      .map((msg) => ({ role: "assistant", content: msg.content! }));
 
     const filteredNewMessages = newBotMessages.filter(
       (msg) =>
@@ -60,26 +48,24 @@ export const handleSendMessage = async (
       setMessages((prev) => [...prev, ...filteredNewMessages]);
     }
 
-    // Apply name/position updates
+    // Apply task-specific update (and track current task)
+    if (formDataUpdate) {
+      if (formDataUpdate.tasks) {
+        const taskKeys = Object.keys(formDataUpdate.tasks);
+        if (taskKeys.length > 0) {
+          setTaskInProgress(taskKeys[0]);
+        }
+      }
+
+      setFormData((prev) => mergeFormDataUpdate(prev, formDataUpdate));
+    }
+
+    // Apply identity update (name/position)
     if (identityUpdate) {
       setFormData((prev) => ({
         ...prev,
         name: identityUpdate.name ?? prev.name,
         position: identityUpdate.position ?? prev.position,
-      }));
-    }
-
-    // Apply task-specific update
-    if (formDataUpdate?.tasks?.[taskInProgress]) {
-      setFormData((prevFormData) => ({
-        ...prevFormData,
-        tasks: {
-          ...prevFormData.tasks,
-          [taskInProgress]: {
-            ...prevFormData.tasks[taskInProgress],
-            ...(formDataUpdate.tasks?.[taskInProgress] ?? {}),
-          },
-        },
       }));
     }
 
