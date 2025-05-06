@@ -1,14 +1,14 @@
-import { GptFormData, ChatMessage, TaskFormData } from "../types";
+import { ChatMessage, GptFormData } from "../types";
 
 export const fetchBotResponse = async (
   messages: ChatMessage[],
   isSpeechEnabled: boolean,
   formData: GptFormData,
-  taskInProgress: string
+  taskInProgress?: string
 ): Promise<{
   message: string;
   audioUrl: string | null;
-  formDataUpdate: Partial<TaskFormData> | null;
+  formDataUpdate: Partial<GptFormData> | null;
   identityUpdate: Partial<Pick<GptFormData, "name" | "position">> | null;
   messageHistory?: { role: string; content?: string }[] | null;
 }> => {
@@ -19,7 +19,7 @@ export const fetchBotResponse = async (
     })),
     isSpeechEnabled,
     formData,
-    taskInProgress,
+    ...(taskInProgress && { taskInProgress }), // Only include if truthy
   };
 
   const res = await fetch(import.meta.env.VITE_API_URL + "IOGpt", {
@@ -52,11 +52,22 @@ export const fetchBotResponse = async (
     ];
   }
 
+  console.log("taskInProgress in fetchBotResponse:", taskInProgress);
+
+  const wrappedFormDataUpdate =
+    data.formDataUpdate && taskInProgress
+      ? {
+          tasks: {
+            [taskInProgress]: data.formDataUpdate,
+          },
+        }
+      : null;
+
   return {
     message: data.message,
-    audioUrl: data.audioUrl || null, // If no audioUrl, return null
-    formDataUpdate: data.formDataUpdate || null,
+    audioUrl: data.audioUrl || null,
+    formDataUpdate: wrappedFormDataUpdate,
     identityUpdate: data.identityUpdate || null,
-    messageHistory: messageHistory,
+    messageHistory,
   };
 };

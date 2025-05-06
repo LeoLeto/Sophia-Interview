@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Avatar from "../components/Avatar";
 import { Chatbox } from "../components/Chatbox";
 import { Messages } from "../components/Messages";
@@ -30,6 +30,10 @@ function MainLayout({ setIsLoggedIn }: MainLayoutProps) {
     tasks: {},
   });
 
+  useEffect(() => {
+    console.log("formData:", formData);
+  }, [formData]);
+
   const [taskInProgress, setTaskInProgress] = useState<string>("");
 
   const handleLogout = () => {
@@ -41,11 +45,7 @@ function MainLayout({ setIsLoggedIn }: MainLayoutProps) {
     setIsChatInitiated(true);
     setLoading(true);
 
-    const initialBotMessage = await startInterview(
-      isSpeechEnabled,
-      formData,
-      taskInProgress
-    );
+    const initialBotMessage = await startInterview(isSpeechEnabled, formData);
 
     setMessages((prev) => [
       ...prev,

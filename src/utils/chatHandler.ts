@@ -1,5 +1,5 @@
 import { GptFormData, ChatMessage } from "../types";
-import { fetchBotResponse } from "../utils/api";
+import { fetchBotResponse } from "./fetchBotResponse";
 
 export const handleSendMessage = async (
   newMessage: string,
@@ -9,7 +9,7 @@ export const handleSendMessage = async (
   isSpeechEnabled: boolean,
   formData: GptFormData,
   setFormData: React.Dispatch<React.SetStateAction<GptFormData>>,
-  taskInProgress: string
+  taskInProgress: keyof GptFormData["tasks"] // Ensure taskInProgress is a valid key of tasks
 ) => {
   const userMsg: ChatMessage = { role: "user", content: newMessage };
 
@@ -70,14 +70,14 @@ export const handleSendMessage = async (
     }
 
     // Apply task-specific update
-    if (formDataUpdate) {
-      setFormData((prev) => ({
-        ...prev,
+    if (formDataUpdate?.tasks?.[taskInProgress]) {
+      setFormData((prevFormData) => ({
+        ...prevFormData,
         tasks: {
-          ...prev.tasks,
+          ...prevFormData.tasks,
           [taskInProgress]: {
-            ...prev.tasks[taskInProgress],
-            ...formDataUpdate,
+            ...prevFormData.tasks[taskInProgress],
+            ...(formDataUpdate.tasks?.[taskInProgress] ?? {}),
           },
         },
       }));
