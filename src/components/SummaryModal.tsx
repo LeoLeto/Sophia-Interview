@@ -26,7 +26,7 @@ const SummaryModal: React.FC<SummaryModalProps> = ({ formData, onClose }) => {
           </li>
         </ul>
 
-        <h3>Tarea en curso</h3>
+        <h3>Tareas</h3>
         {Object.entries(formData.tasks).map(([taskName, task]) => (
           <div key={taskName} className="taskSummary">
             <h4>{taskName}</h4>

@@ -181,10 +181,9 @@ button:hover {
 
 .userMessage {
     align-self                : end;
-    text-align                : right;
     color                     : black;
     background-color          : #00000014;
-    width                     : fit-content;
+    width                     : 90%;
     padding                   : 1rem;
     border-radius             : 1rem;
     border-bottom-right-radius: 0;
@@ -270,6 +269,11 @@ button:hover {
 
 .modalContent h3:nth-of-type(2) {
     margin-top: 1rem;
+}
+
+.modalContent h4 {
+    font-weight  : 600;
+    margin-bottom: 1rem;
 }
 
 ul {
