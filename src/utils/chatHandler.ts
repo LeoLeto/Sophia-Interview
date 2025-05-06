@@ -18,21 +18,23 @@ export const handleSendMessage = async (
   setLoading(true);
 
   try {
-    const { message, audioUrl, formDataUpdate, messageHistory } =
-      await fetchBotResponse(
-        [...currentMessages, userMsg],
-        isSpeechEnabled,
-        formData,
-        taskInProgress
-      );
+    const {
+      message,
+      audioUrl,
+      formDataUpdate,
+      identityUpdate,
+      messageHistory,
+    } = await fetchBotResponse(
+      [...currentMessages, userMsg],
+      isSpeechEnabled,
+      formData,
+      taskInProgress
+    );
 
     console.log(" message: ", message);
-    // console.log(" messageHistory: ", messageHistory);
 
-    // Initialize the messages array that will be updated
+    // Process any assistant message history
     let newBotMessages: ChatMessage[] = [];
-
-    // If there is messageHistory, filter and map them to the expected format
     if (messageHistory?.length) {
       newBotMessages = messageHistory
         .filter(
@@ -45,10 +47,8 @@ export const handleSendMessage = async (
           role: "assistant",
           content: msg.content!,
         }));
-      console.log(" newBotMessages: ", newBotMessages);
     }
 
-    // Check for duplicates before appending
     const filteredNewMessages = newBotMessages.filter(
       (msg) =>
         !currentMessages.some(
@@ -56,23 +56,40 @@ export const handleSendMessage = async (
         )
     );
 
-    // Add the new bot messages to the state only if they are not duplicates
     if (filteredNewMessages.length) {
       setMessages((prev) => [...prev, ...filteredNewMessages]);
     }
 
-    // Apply updates to formData if any
-    if (formDataUpdate) {
-      setFormData((prev) => ({ ...prev, ...formDataUpdate }));
+    // Apply name/position updates
+    if (identityUpdate) {
+      setFormData((prev) => ({
+        ...prev,
+        name: identityUpdate.name ?? prev.name,
+        position: identityUpdate.position ?? prev.position,
+      }));
     }
 
-    // Only speak the response if speech is enabled and audioUrl is present
+    // Apply task-specific update
+    if (formDataUpdate) {
+      setFormData((prev) => ({
+        ...prev,
+        tasks: {
+          ...prev.tasks,
+          [taskInProgress]: {
+            ...prev.tasks[taskInProgress],
+            ...formDataUpdate,
+          },
+        },
+      }));
+    }
+
+    // Optional speech playback
     if (isSpeechEnabled && audioUrl) {
       const audio = new Audio(audioUrl);
       audio.play();
     }
   } catch (error) {
-    console.log(" error: ", error);
+    console.error("error in handleSendMessage:", error);
     const errorMsg: ChatMessage = {
       role: "assistant",
       content: "Lo siento, ocurrió un error al responder.",

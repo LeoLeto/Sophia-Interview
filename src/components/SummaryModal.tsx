@@ -7,11 +7,7 @@ interface SummaryModalProps {
   onClose: () => void;
 }
 
-const SummaryModal: React.FC<SummaryModalProps> = ({
-  formData,
-  taskInProgress,
-  onClose,
-}) => {
+const SummaryModal: React.FC<SummaryModalProps> = ({ formData, onClose }) => {
   return (
     <div className="modalOverlay">
       <div className="modalContent">
@@ -31,26 +27,28 @@ const SummaryModal: React.FC<SummaryModalProps> = ({
         </ul>
 
         <h3>Tarea en curso</h3>
-        <ul>
-          <li>
-            <strong>Nombre de la tarea:</strong> {taskInProgress || "Pendiente"}
-          </li>
-          <li>
-            <strong>Frecuencia y tiempo:</strong>{" "}
-            {formData.frequencyAndTime || "Pendiente"}
-          </li>
-          <li>
-            <strong>Dificultad:</strong> {formData.difficulty || "Pendiente"}
-          </li>
-          <li>
-            <strong>Valor agregado:</strong>{" "}
-            {formData.addedValue || "Pendiente"}
-          </li>
-          <li>
-            <strong>Priorización implícita:</strong>{" "}
-            {formData.implicitPriority || "Pendiente"}
-          </li>
-        </ul>
+        {Object.entries(formData.tasks).map(([taskName, task]) => (
+          <div key={taskName} className="taskSummary">
+            <h4>{taskName}</h4>
+            <ul>
+              <li>
+                <strong>Frecuencia y tiempo:</strong>{" "}
+                {task.frequencyAndTime || "Pendiente"}
+              </li>
+              <li>
+                <strong>Dificultad:</strong> {task.difficulty || "Pendiente"}
+              </li>
+              <li>
+                <strong>Valor agregado:</strong>{" "}
+                {task.addedValue || "Pendiente"}
+              </li>
+              <li>
+                <strong>Priorización implícita:</strong>{" "}
+                {task.implicitPriority || "Pendiente"}
+              </li>
+            </ul>
+          </div>
+        ))}
       </div>
     </div>
   );

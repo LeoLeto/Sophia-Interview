@@ -1,20 +1,21 @@
-import { GptFormData, ChatMessage } from "../types";
+import { GptFormData, ChatMessage, TaskFormData } from "../types";
 
 export const fetchBotResponse = async (
   messages: ChatMessage[],
-  isSpeechEnabled: boolean, // Add isSpeechEnabled as an argument
+  isSpeechEnabled: boolean,
   formData: GptFormData,
   taskInProgress: string
 ): Promise<{
   message: string;
   audioUrl: string | null;
-  formDataUpdate: Partial<GptFormData> | null;
+  formDataUpdate: Partial<TaskFormData> | null;
+  identityUpdate: Partial<Pick<GptFormData, "name" | "position">> | null;
   messageHistory?: { role: string; content?: string }[] | null;
 }> => {
   const payload = {
     messages: messages.map((msg) => ({
       role: msg.role === "user" ? "user" : "assistant",
-      content: msg.content    ,
+      content: msg.content,
     })),
     isSpeechEnabled,
     formData,
@@ -55,6 +56,7 @@ export const fetchBotResponse = async (
     message: data.message,
     audioUrl: data.audioUrl || null, // If no audioUrl, return null
     formDataUpdate: data.formDataUpdate || null,
+    identityUpdate: data.identityUpdate || null,
     messageHistory: messageHistory,
   };
 };

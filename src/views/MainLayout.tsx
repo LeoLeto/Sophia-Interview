@@ -27,10 +27,7 @@ function MainLayout({ setIsLoggedIn }: MainLayoutProps) {
   const [formData, setFormData] = useState<GptFormData>({
     name: null,
     position: null,
-    frequencyAndTime: null,
-    difficulty: null,
-    addedValue: null,
-    implicitPriority: null,
+    tasks: {},
   });
 
   const [taskInProgress, setTaskInProgress] = useState<string>("");
@@ -73,18 +70,12 @@ function MainLayout({ setIsLoggedIn }: MainLayoutProps) {
     // If task is defined and form is complete, reset for next task
     if (
       taskInProgress &&
-      isTaskFormComplete(formData) &&
+      formData.tasks[taskInProgress] &&
+      isTaskFormComplete(formData, taskInProgress) &&
       isIdentityComplete(formData)
     ) {
       setTimeout(() => {
         setTaskInProgress("");
-        setFormData((prev) => ({
-          ...prev,
-          frequencyAndTime: null,
-          difficulty: null,
-          addedValue: null,
-          implicitPriority: null,
-        }));
       }, 1500);
     }
   };
