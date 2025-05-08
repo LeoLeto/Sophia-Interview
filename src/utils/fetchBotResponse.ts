@@ -4,7 +4,9 @@ export const fetchBotResponse = async (
   messages: ChatMessage[],
   isSpeechEnabled: boolean,
   formData: GptFormData,
-  taskInProgress?: string
+  taskInProgress: string | undefined,
+  userEmail: string,
+  sessionId: string
 ): Promise<{
   message: string;
   audioUrl: string | null;
@@ -14,12 +16,14 @@ export const fetchBotResponse = async (
 }> => {
   const payload = {
     messages: messages.map((msg) => ({
-      role: msg.role === "user" ? "user" : "assistant",
+      role: msg.role,
       content: msg.content,
     })),
     isSpeechEnabled,
     formData,
-    ...(taskInProgress && { taskInProgress }), // Only include if truthy
+    ...(taskInProgress && { taskInProgress }),
+    userEmail,
+    sessionId,
   };
 
   const res = await fetch(import.meta.env.VITE_API_URL + "IOGpt", {
@@ -32,13 +36,13 @@ export const fetchBotResponse = async (
   const message = data.message;
   let messageHistory: ChatMessage[] = data.messageHistory;
 
-  console.log(" data: ", data);
+  console.log("data:", data);
+  console.log("taskInProgress in fetchBotResponse:", taskInProgress);
 
   if (!res.ok || !data.message) {
     throw new Error("Error fetching response");
   }
 
-  // Ensure latest assistant message is included in messageHistory
   if (
     data.message &&
     (!data.messageHistory?.length ||
@@ -52,16 +56,16 @@ export const fetchBotResponse = async (
     ];
   }
 
-  console.log("taskInProgress in fetchBotResponse:", taskInProgress);
-
-  const wrappedFormDataUpdate = data.formDataUpdate?.tasks
+  const wrappedFormDataUpdate = data.formDataUpdate
     ? {
-        tasks: data.formDataUpdate.tasks,
+        name: data.formDataUpdate.name ?? undefined,
+        position: data.formDataUpdate.position ?? undefined,
+        tasks: data.formDataUpdate.tasks ?? {},
       }
     : null;
 
   return {
-    message: data.message,
+    message,
     audioUrl: data.audioUrl || null,
     formDataUpdate: wrappedFormDataUpdate,
     identityUpdate: data.identityUpdate || null,

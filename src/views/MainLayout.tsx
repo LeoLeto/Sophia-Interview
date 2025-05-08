@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import { useRef, useState } from "react";
 import Avatar from "../components/Avatar";
 import { Chatbox } from "../components/Chatbox";
 import { Messages } from "../components/Messages";
 import SummaryModal from "../components/SummaryModal";
 import { ChatMessage, GptFormData } from "../types";
-import { handleSendMessage } from "../utils/chatHandler";
+import { handleSendMessage } from "../utils/handleSendMessage";
 import { getGenderedGreeting } from "../utils/getGenderedGreeting";
 import { startInterview } from "../utils/startInterview";
 
@@ -27,9 +27,12 @@ function MainLayout({ setIsLoggedIn }: MainLayoutProps) {
     tasks: {},
   });
 
-  useEffect(() => {
-    console.log("formData:", formData);
-  }, [formData]);
+  const sessionId = useRef<string>(crypto.randomUUID());
+  const { userId } = JSON.parse(localStorage.getItem("user") || "{}");
+
+  // useEffect(() => {
+  //   console.log("formData:", formData);
+  // }, [formData]);
 
   const handleLogout = () => {
     localStorage.removeItem("user");
@@ -40,7 +43,12 @@ function MainLayout({ setIsLoggedIn }: MainLayoutProps) {
     setIsChatInitiated(true);
     setLoading(true);
 
-    const initialBotMessage = await startInterview(isSpeechEnabled, formData);
+    const initialBotMessage = await startInterview(
+      isSpeechEnabled,
+      formData,
+      sessionId.current!,
+      userId
+    );
 
     setMessages((prev) => [
       ...prev,
@@ -60,7 +68,9 @@ function MainLayout({ setIsLoggedIn }: MainLayoutProps) {
       formData,
       setFormData,
       taskInProgress,
-      setTaskInProgress
+      setTaskInProgress,
+      sessionId.current!,
+      userId
     );
   };
 

@@ -24,7 +24,6 @@ const useLogin = (
       });
 
       if (response.status === 200) {
-        // Successful login
         const userData = await response.json();
         localStorage.setItem("user", JSON.stringify(userData));
         setIsLoggedIn(true);

@@ -3,7 +3,9 @@ import { GptFormData, ChatMessage } from "../types";
 
 export const startInterview = async (
   isSpeechEnabled: boolean,
-  formData: GptFormData
+  formData: GptFormData,
+  sessionId: string,
+  userId: string
 ): Promise<{
   message: string;
   formDataUpdate: Partial<GptFormData> | null;
@@ -19,7 +21,14 @@ export const startInterview = async (
       message: botMessage,
       formDataUpdate,
       messageHistory,
-    } = await fetchBotResponse([initialMessage], isSpeechEnabled, formData);
+    } = await fetchBotResponse(
+      [initialMessage],
+      isSpeechEnabled,
+      formData,
+      undefined,
+      userId,
+      sessionId
+    );
 
     return {
       message: botMessage,

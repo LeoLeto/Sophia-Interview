@@ -1,6 +1,5 @@
-import { GptFormData, ChatMessage } from "../types";
+import { ChatMessage, GptFormData } from "../types";
 import { fetchBotResponse } from "./fetchBotResponse";
-import { mergeFormDataUpdate } from "./mergeFormDataUpdate";
 
 export const handleSendMessage = async (
   newMessage: string,
@@ -11,7 +10,9 @@ export const handleSendMessage = async (
   formData: GptFormData,
   setFormData: React.Dispatch<React.SetStateAction<GptFormData>>,
   taskInProgress: keyof GptFormData["tasks"],
-  setTaskInProgress: (taskKey: string) => void
+  setTaskInProgress: (taskKey: string) => void,
+  sessionId: string,
+  userId: string
 ) => {
   const userMsg: ChatMessage = { role: "user", content: newMessage };
 
@@ -19,13 +20,14 @@ export const handleSendMessage = async (
   setLoading(true);
 
   try {
-    const { audioUrl, formDataUpdate, identityUpdate, messageHistory } =
-      await fetchBotResponse(
-        [...currentMessages, userMsg],
-        isSpeechEnabled,
-        formData,
-        taskInProgress
-      );
+    const { audioUrl, formDataUpdate, messageHistory } = await fetchBotResponse(
+      [...currentMessages, userMsg],
+      isSpeechEnabled,
+      formData,
+      taskInProgress,
+      userId,
+      sessionId
+    );
 
     // Process assistant messages from history
     const newBotMessages: ChatMessage[] = (messageHistory || [])
@@ -47,26 +49,38 @@ export const handleSendMessage = async (
     if (filteredNewMessages.length) {
       setMessages((prev) => [...prev, ...filteredNewMessages]);
     }
-
-    // Apply task-specific update (and track current task)
+    
+    // Apply formData updates if valid
     if (formDataUpdate) {
-      if (formDataUpdate.tasks) {
-        const taskKeys = Object.keys(formDataUpdate.tasks);
-        if (taskKeys.length > 0) {
-          setTaskInProgress(taskKeys[0]);
-        }
-      }
+      const cleanedTasks =
+        formDataUpdate.tasks && typeof formDataUpdate.tasks === "object"
+          ? Object.fromEntries(
+              Object.entries(formDataUpdate.tasks).filter(
+                ([key, task]) => key && task && typeof task === "object"
+              )
+            )
+          : {};
 
-      setFormData((prev) => mergeFormDataUpdate(prev, formDataUpdate));
-    }
+      // ONLY UPDATES NAME AND POSITION IF THEY HAVE VALID VALUES
+      const keepIfValid = <T>(incoming: T | undefined | null, existing: T): T =>
+        typeof incoming === "string" && incoming.trim() !== ""
+          ? incoming
+          : existing;
 
-    // Apply identity update (name/position)
-    if (identityUpdate) {
       setFormData((prev) => ({
         ...prev,
-        name: identityUpdate.name ?? prev.name,
-        position: identityUpdate.position ?? prev.position,
+        name: keepIfValid(formDataUpdate.name, prev.name),
+        position: keepIfValid(formDataUpdate.position, prev.position),
+        tasks: {
+          ...prev.tasks,
+          ...cleanedTasks,
+        },
       }));
+
+      const taskKeys = Object.keys(cleanedTasks);
+      if (taskKeys.length > 0) {
+        setTaskInProgress(taskKeys[0]);
+      }
     }
 
     // Optional speech playback
