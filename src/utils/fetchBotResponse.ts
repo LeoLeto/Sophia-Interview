@@ -12,7 +12,7 @@ export const fetchBotResponse = async (
   audioUrl: string | null;
   formDataUpdate: Partial<GptFormData> | null;
   identityUpdate: Partial<Pick<GptFormData, "name" | "position">> | null;
-  messageHistory?: { role: string; content?: string }[] | null;
+  messageHistory?: ChatMessage[] | null;
 }> => {
   const payload = {
     messages: messages.map((msg) => ({
@@ -47,12 +47,19 @@ export const fetchBotResponse = async (
     data.message &&
     (!data.messageHistory?.length ||
       !messageHistory.some(
-        (m) => m.role === "assistant" && m.content?.trim() === message.trim()
+        (m) =>
+          m.role === "assistant" &&
+          m.type === "text" &&
+          m.content.trim() === message.trim()
       ))
   ) {
     messageHistory = [
       ...(messageHistory || []),
-      { role: "assistant", content: message },
+      {
+        type: "text",
+        role: "assistant",
+        content: message,
+      },
     ];
   }
 

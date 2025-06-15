@@ -290,12 +290,19 @@ strong {
 }
 
 .closeButton {
-    position   : absolute;
-    top        : 1rem;
-    right      : 1rem;
+    position      : absolute;
+    top           : 1rem;
+    right         : 1rem;
     /* background : transparent; */
-    font-size  : 1.25rem;
-    border     : none;
-    cursor     : pointer;
-    text-shadow: none;
+    font-size     : 1.25rem;
+    border        : none;
+    cursor        : pointer;
+    text-shadow   : none;
+}
+
+.optionsContainer {
+    display  : flex;
+    flex-wrap: wrap;
+    gap      : 1rem;
+
 }

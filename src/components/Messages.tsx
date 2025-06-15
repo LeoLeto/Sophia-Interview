@@ -1,7 +1,14 @@
+// Messages.tsx
 import { useEffect, useRef } from "react";
 import { ChatMessage } from "../types";
 
-export function Messages({ messages }: { messages: ChatMessage[] }) {
+export function Messages({
+  messages,
+  onOptionSelect,
+}: {
+  messages: ChatMessage[];
+  onOptionSelect: (msgIndex: number, optionIndex: number) => void;
+}) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -15,10 +22,28 @@ export function Messages({ messages }: { messages: ChatMessage[] }) {
           key={idx}
           className={msg.role === "user" ? "userMessage" : "botMessage"}
         >
-          {msg.content}
+          {msg.type === "text" && <span>{msg.content as string}</span>}
+
+          {msg.type === "options" && (
+            <div className="optionsContainer">
+              {(
+                msg.content as { options: string[]; selected?: number }
+              ).options.map((opt, i) => (
+                <button
+                  key={i}
+                  onClick={() => onOptionSelect(idx, i)}
+                  disabled={
+                    msg.type === "options" && msg.content.selected !== undefined
+                  }
+                  className="optionButton"
+                >
+                  {opt}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       ))}
-      {/* Invisible anchor div to scroll into view */}
       <div ref={messagesEndRef} />
     </div>
   );

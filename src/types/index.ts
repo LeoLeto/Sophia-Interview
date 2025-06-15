@@ -1,7 +1,17 @@
-export type ChatMessage = {
-  role: "user" | "assistant";
-  content: string;
-};
+export type ChatMessage =
+  | {
+      role: "user" | "assistant" | "system";
+      type: "text";
+      content: string;
+    }
+  | {
+      role: "assistant";
+      type: "options";
+      content: {
+        options: string[];
+        selected?: number;
+      };
+    };
 
 export interface GptFormData {
   name: string | null;

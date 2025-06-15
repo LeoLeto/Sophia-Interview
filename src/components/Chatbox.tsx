@@ -6,6 +6,7 @@ type ChatboxProps = {
   setInputValue: (value: string) => void;
   loading: boolean;
   isChatInitiated: boolean;
+  indexChatProgress: number;
 };
 
 interface SpeechRecognitionType extends EventTarget {
@@ -42,6 +43,7 @@ export function Chatbox({
   setInputValue,
   loading,
   isChatInitiated,
+  indexChatProgress,
 }: ChatboxProps) {
   const handleSend = () => {
     if (inputValue.trim() !== "") {
@@ -97,6 +99,14 @@ export function Chatbox({
     }
   };
 
+  const getPlaceholder = (): string => {
+    if (loading) return "Cargando...";
+    if (!isChatInitiated) return "Inicia el chat para comenzar...";
+    if (indexChatProgress == 1) return "Escribe aquí tu nombre"
+    if (indexChatProgress == 2) return "Escribe aquí el nombre de tu empresa"
+    return "Escribe aquí tu mensaje...";
+  };
+
   return (
     <div className={`chatboxContainer ${!isChatInitiated ? "disabled" : ""}`}>
       <input
@@ -104,7 +114,7 @@ export function Chatbox({
         value={inputValue}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
-        placeholder="Escribe aquí tu mensaje..."
+        placeholder={getPlaceholder()}
         disabled={loading || !isChatInitiated}
       />
 

@@ -12,14 +12,66 @@ export const handleSendMessage = async (
   taskInProgress: keyof GptFormData["tasks"],
   setTaskInProgress: (taskKey: string) => void,
   sessionId: string,
-  userId: string
+  userId: string,
+  indexChatProgress: number,
+  setIndexChatProgress: React.Dispatch<React.SetStateAction<number>>
 ) => {
-  const userMsg: ChatMessage = { role: "user", content: newMessage };
+  const userMsg: ChatMessage = {
+    type: "text",
+    role: "user",
+    content: newMessage,
+  };
 
   setMessages((prev) => [...prev, userMsg]);
   setLoading(true);
 
   try {
+    // USER INPUTS NAME
+    if (indexChatProgress == 1) {
+      setMessages((prev) => [
+        ...prev,
+        {
+          type: "text",
+          role: "system",
+          content: "Y ahora, ¿podrías decirme tu cargo en la empresa?",
+        },
+      ]);
+
+      setIndexChatProgress(2);
+
+      return;
+    }
+    // USER INPUTS COMPANY POSITION
+    if (indexChatProgress == 2) {
+      // 🟢 TODO: ADD HERE OPENAI ASSISTANT TO GET ROLE-RELATED TASKS
+      setMessages((prev) => [
+        ...prev,
+        {
+          type: "text",
+          role: "system",
+          content:
+            "He seleccionado 5 de las tareas más comunes de un vendedor; escoge la tarea que deseas optimizar o escribe una diferente si no se encuentra entre las opciones",
+        },
+        {
+          role: "assistant",
+          type: "options",
+          content: {
+            options: [
+              "Option 1",
+              "Option 2",
+              "Option 3",
+              "Option 4",
+              "Option 5",
+            ],
+          },
+        },
+      ]);
+
+      setIndexChatProgress(3);
+
+      return;
+    }
+
     const { audioUrl, formDataUpdate, messageHistory } = await fetchBotResponse(
       [...currentMessages, userMsg],
       isSpeechEnabled,
@@ -32,12 +84,17 @@ export const handleSendMessage = async (
     // Process assistant messages from history
     const newBotMessages: ChatMessage[] = (messageHistory || [])
       .filter(
-        (msg) =>
+        (msg): msg is ChatMessage & { type: "text"; content: string } =>
           msg.role === "assistant" &&
+          msg.type === "text" &&
           typeof msg.content === "string" &&
           msg.content.trim().length > 0
       )
-      .map((msg) => ({ role: "assistant", content: msg.content! }));
+      .map((msg) => ({
+        type: "text",
+        role: "assistant",
+        content: msg.content,
+      }));
 
     const filteredNewMessages = newBotMessages.filter(
       (msg) =>
@@ -49,7 +106,7 @@ export const handleSendMessage = async (
     if (filteredNewMessages.length) {
       setMessages((prev) => [...prev, ...filteredNewMessages]);
     }
-    
+
     // Apply formData updates if valid
     if (formDataUpdate) {
       const cleanedTasks =
@@ -91,6 +148,7 @@ export const handleSendMessage = async (
   } catch (error) {
     console.error("error in handleSendMessage:", error);
     const errorMsg: ChatMessage = {
+      type: "text",
       role: "assistant",
       content: "Lo siento, ocurrió un error al responder.",
     };

@@ -14,7 +14,7 @@ const Avatar = ({ isSpeechEnabled, setIsSpeechEnabled }: AvatarProps) => {
       <button
         style={{ zIndex: "1" }}
         onClick={handleToggleSpeech}
-        className="speechToggleButton"
+        className="speechToggleButton disabled"
       >
         {isSpeechEnabled
           ? "🔊 Respuesta hablada activada"
