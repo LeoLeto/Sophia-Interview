@@ -11,6 +11,9 @@ export type ChatMessage =
         options: string[];
         selected?: number;
       };
+      meta?: {
+        field: string; // e.g. "task", "frequency", "duration", etc.
+      };
     };
 
 export interface GptFormData {

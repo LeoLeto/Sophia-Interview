@@ -66,7 +66,9 @@ function MainLayout({ setIsLoggedIn }: MainLayoutProps) {
       messages,
       setMessages,
       setFormData,
+      taskInProgress, // add this, from state
       setTaskInProgress,
+      fieldIndex, // add this, from state
       setFieldIndex,
     });
   };

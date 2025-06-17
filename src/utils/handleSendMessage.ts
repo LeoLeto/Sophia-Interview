@@ -105,6 +105,7 @@ export const handleSendMessage = async (
               content: {
                 options: result.tasks,
               },
+              meta: { field: "task" }, // <--- Add this line!
             },
           ]);
         }
