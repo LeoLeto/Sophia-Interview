@@ -7,11 +7,15 @@ export function isTaskFormComplete(
   const currentTask = formData.tasks?.[taskName];
   if (!currentTask) return false;
 
-  const { frequencyAndTime, difficulty, addedValue, implicitPriority } =
+  const { frequency, duration, difficulty, addedValue, implicitPriority } =
     currentTask;
 
   return (
-    !!frequencyAndTime && !!difficulty && !!addedValue && !!implicitPriority
+    !!frequency &&
+    !!duration &&
+    !!difficulty &&
+    !!addedValue &&
+    !!implicitPriority
   );
 }
 

@@ -2,6 +2,10 @@
 import { useEffect, useRef } from "react";
 import { ChatMessage } from "../types";
 
+type OptionContent =
+  | { options: string[]; selected?: number } // Task or string options
+  | { options: (string | number)[]; selected?: number }; // Numeric with labels
+
 export function Messages({
   messages,
   onOptionSelect,
@@ -26,14 +30,12 @@ export function Messages({
 
           {msg.type === "options" && (
             <div className="optionsContainer">
-              {(
-                msg.content as { options: string[]; selected?: number }
-              ).options.map((opt, i) => (
+              {(msg.content as OptionContent).options.map((opt, i) => (
                 <button
                   key={i}
                   onClick={() => onOptionSelect(idx, i)}
                   disabled={
-                    msg.type === "options" && msg.content.selected !== undefined
+                    (msg.content as OptionContent).selected !== undefined
                   }
                   className="optionButton"
                 >

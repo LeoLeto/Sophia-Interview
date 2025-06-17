@@ -1,12 +1,12 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
 import Avatar from "../components/Avatar";
 import { Chatbox } from "../components/Chatbox";
 import { Messages } from "../components/Messages";
 import SummaryModal from "../components/SummaryModal";
 import { ChatMessage, GptFormData } from "../types";
 import { getGenderedGreeting } from "../utils/getGenderedGreeting";
-import { handleSendMessage } from "../utils/handleSendMessage";
 import { handleTaskOptionSelect } from "../utils/handleOptionSelect";
+import { handleSendMessage } from "../utils/handleSendMessage";
 
 interface MainLayoutProps {
   setIsLoggedIn: (value: boolean) => void;
@@ -19,8 +19,10 @@ function MainLayout({ setIsLoggedIn }: MainLayoutProps) {
   const [isSpeechEnabled, setIsSpeechEnabled] = useState<boolean>(false);
   const [showSummary, setShowSummary] = useState(false);
   const [isChatInitiated, setIsChatInitiated] = useState<boolean>(false);
-  const [taskInProgress, setTaskInProgress] = useState<string>("");
+  const [taskInProgress, setTaskInProgress] = useState<string | null>(null);
   const [indexChatProgress, setChatProgressIndex] = useState<number>(0);
+  const [fieldIndex, setFieldIndex] = useState(0);
+
   // const [jobTasks, setJobTastks] = useState<string[]>([]);
 
   const [formData, setFormData] = useState<GptFormData>({
@@ -29,8 +31,8 @@ function MainLayout({ setIsLoggedIn }: MainLayoutProps) {
     tasks: {},
   });
 
-  const sessionId = useRef<string>(crypto.randomUUID());
-  const { userId } = JSON.parse(localStorage.getItem("user") || "{}");
+  // const sessionId = useRef<string>(crypto.randomUUID());
+  // const { userId } = JSON.parse(localStorage.getItem("user") || "{}");
 
   // useEffect(() => {
   //   console.log("formData:", formData);
@@ -57,32 +59,35 @@ function MainLayout({ setIsLoggedIn }: MainLayoutProps) {
     setLoading(false);
   };
 
-  const handleOptionSelect = (msgIndex: number, optionIndex: number) => {
+  const onTaskOptionSelect = (msgIndex: number, optionIndex: number) => {
     handleTaskOptionSelect({
       msgIndex,
       optionIndex,
       messages,
       setMessages,
       setFormData,
+      setTaskInProgress,
+      setFieldIndex,
     });
   };
 
   const handleSend = async (newMessage: string) => {
     await handleSendMessage(
       newMessage,
-      messages,
+      // messages,
       setMessages,
       setLoading,
-      isSpeechEnabled,
-      formData,
+      // isSpeechEnabled,
+      // formData,
       setFormData,
+      indexChatProgress,
+      setChatProgressIndex,
       taskInProgress,
       setTaskInProgress,
-      sessionId.current!,
-      userId,
-      indexChatProgress,
-      setChatProgressIndex
-      // setJobTastks
+      // sessionId.current!,
+      // userId,
+      fieldIndex,
+      setFieldIndex
     );
   };
 
@@ -117,7 +122,7 @@ function MainLayout({ setIsLoggedIn }: MainLayoutProps) {
             💬 Haz click en Iniciar para comenzar tu entrevista
           </div>
         )}
-        <Messages messages={messages} onOptionSelect={handleOptionSelect} />
+        <Messages messages={messages} onOptionSelect={onTaskOptionSelect} />
         {loading && <div className="spinner">⏳</div>}
         <Chatbox
           onSendMessage={handleSend}

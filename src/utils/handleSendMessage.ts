@@ -1,23 +1,55 @@
-import { ChatMessage, GptFormData } from "../types";
-import { fetchBotResponse } from "./fetchBotResponse";
+import { ChatMessage, GptFormData, TaskFormData } from "../types";
 import { fetchTaskFinder } from "./fetchTasks";
+
+const TASK_FIELDS: (keyof TaskFormData)[] = [
+  "frequency",
+  "duration",
+  "difficulty",
+  "addedValue",
+  "implicitPriority",
+];
+
+export const FIELD_OPTIONS: Partial<Record<keyof TaskFormData, string[]>> = {
+  frequency: [
+    "Menos de una vez por semana", // 0
+    "Al menos una vez por semana", // 1
+    "De dos a tres veces por semana", // 2
+    "Al menos una vez todos los días", // 3
+    "Todos los días, múltiples veces", // 4
+  ],
+  duration: [
+    "Menos de 15 minutos", // 0
+    "Entre 15 y 30 minutos", // 1
+    "Entre 30 minutos y una hora", // 2
+    "Entre una y dos horas", // 3
+    "Más de dos horas", // 4
+  ],
+  difficulty: [
+    "Baja", // 0
+    "Media", // 1
+    "Alta", // 2
+  ],
+  implicitPriority: [
+    "Baja", // 0
+    "Media", // 1
+    "Alta", // 2
+  ],
+};
 
 export const handleSendMessage = async (
   newMessage: string,
-  currentMessages: ChatMessage[],
   setMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>,
   setLoading: React.Dispatch<React.SetStateAction<boolean>>,
-  isSpeechEnabled: boolean,
-  formData: GptFormData,
   setFormData: React.Dispatch<React.SetStateAction<GptFormData>>,
-  taskInProgress: keyof GptFormData["tasks"],
-  setTaskInProgress: (taskKey: string) => void,
-  sessionId: string,
-  userId: string,
   indexChatProgress: number,
-  setIndexChatProgress: React.Dispatch<React.SetStateAction<number>>
-  // setJobTasks: React.Dispatch<React.SetStateAction<string[]>>
+  setIndexChatProgress: React.Dispatch<React.SetStateAction<number>>,
+  taskInProgress: string | null,
+  setTaskInProgress: (taskKey: string | null) => void,
+  fieldIndex: number,
+  setFieldIndex: React.Dispatch<React.SetStateAction<number>>
 ) => {
+  console.log("[handleSendMessage] Called with message:", newMessage);
+
   const userMsg: ChatMessage = {
     type: "text",
     role: "user",
@@ -27,20 +59,18 @@ export const handleSendMessage = async (
   setMessages((prev) => [...prev, userMsg]);
   setLoading(true);
 
-  // ONLY UPDATES NAME AND POSITION IF THEY HAVE VALID VALUES
   const keepIfValid = <T>(incoming: T | undefined | null, existing: T): T =>
     typeof incoming === "string" && incoming.trim() !== ""
       ? incoming
       : existing;
 
   try {
-    // USER INPUTS NAME
-    if (indexChatProgress == 1) {
+    // Step 1: Name
+    if (indexChatProgress === 1) {
       setFormData((prev) => ({
         ...prev,
         name: keepIfValid(newMessage, prev.name),
       }));
-
       setMessages((prev) => [
         ...prev,
         {
@@ -49,23 +79,19 @@ export const handleSendMessage = async (
           content: "Y ahora, ¿podrías decirme tu cargo en la empresa?",
         },
       ]);
-
       setIndexChatProgress(2);
-
       return;
     }
-    // USER INPUTS COMPANY POSITION
-    if (indexChatProgress == 2) {
+
+    // Step 2: Position
+    if (indexChatProgress === 2) {
       setFormData((prev) => ({
         ...prev,
         position: keepIfValid(newMessage, prev.position),
       }));
-
       try {
         const result = await fetchTaskFinder(newMessage);
         if (result.found) {
-          console.log("Tasks:", result.tasks);
-          // setJobTasks(result.tasks);
           setMessages((prev) => [
             ...prev,
             {
@@ -81,88 +107,118 @@ export const handleSendMessage = async (
               },
             },
           ]);
-        } else {
-          console.warn("Not found:", result.reason);
         }
       } catch (err) {
-        if (err instanceof Error) {
-          console.error("Request failed:", err.message);
-        } else {
-          console.error("Request failed:", err);
-        }
+        console.error("Request failed:", err);
       }
-
       setIndexChatProgress(3);
-
       return;
     }
 
-    const { audioUrl, formDataUpdate, messageHistory } = await fetchBotResponse(
-      [...currentMessages, userMsg],
-      isSpeechEnabled,
-      formData,
-      taskInProgress,
-      userId,
-      sessionId
-    );
+    // Step 3+: Task field input flow
+    if (taskInProgress) {
+      const currentField = TASK_FIELDS[fieldIndex];
 
-    // Process assistant messages from history
-    const newBotMessages: ChatMessage[] = (messageHistory || [])
-      .filter(
-        (msg): msg is ChatMessage & { type: "text"; content: string } =>
-          msg.role === "assistant" &&
-          msg.type === "text" &&
-          typeof msg.content === "string" &&
-          msg.content.trim().length > 0
-      )
-      .map((msg) => ({
-        type: "text",
-        role: "assistant",
-        content: msg.content,
-      }));
-
-    const filteredNewMessages = newBotMessages.filter(
-      (msg) =>
-        !currentMessages.some(
-          (m) => m.content === msg.content && m.role === msg.role
-        )
-    );
-
-    if (filteredNewMessages.length) {
-      setMessages((prev) => [...prev, ...filteredNewMessages]);
-    }
-
-    // Apply formData updates if valid
-    if (formDataUpdate) {
-      const cleanedTasks =
-        formDataUpdate.tasks && typeof formDataUpdate.tasks === "object"
-          ? Object.fromEntries(
-              Object.entries(formDataUpdate.tasks).filter(
-                ([key, task]) => key && task && typeof task === "object"
-              )
-            )
-          : {};
-
+      // Save the response to formData
       setFormData((prev) => ({
         ...prev,
-        name: keepIfValid(formDataUpdate.name, prev.name),
-        position: keepIfValid(formDataUpdate.position, prev.position),
         tasks: {
           ...prev.tasks,
-          ...cleanedTasks,
+          [taskInProgress]: {
+            ...prev.tasks[taskInProgress],
+            [currentField]: newMessage,
+          },
         },
       }));
 
-      const taskKeys = Object.keys(cleanedTasks);
-      if (taskKeys.length > 0) {
-        setTaskInProgress(taskKeys[0]);
-      }
-    }
+      // Advance to next field or task
+      if (fieldIndex < TASK_FIELDS.length - 1) {
+        const nextField = TASK_FIELDS[fieldIndex + 1];
+        const options = FIELD_OPTIONS[nextField];
 
-    // Optional speech playback
-    if (isSpeechEnabled && audioUrl) {
-      const audio = new Audio(audioUrl);
-      audio.play();
+        console.log("Inserting next field question and options:", {
+          nextField,
+          options,
+        });
+
+        setMessages((prev) => [
+          ...prev,
+          {
+            type: "text",
+            role: "system",
+            content: `¿Cuál es la ${nextField} de esta tarea?`,
+          },
+          ...(options
+            ? [
+                {
+                  type: "options",
+                  role: "assistant",
+                  content: { options },
+                } as const,
+              ]
+            : []),
+        ]);
+
+        setFieldIndex(fieldIndex + 1);
+      } else {
+        // Done with this task
+        setFieldIndex(0);
+
+        // Check for other remaining tasks
+        setFormData((prev) => {
+          const remainingTasks = Object.entries(prev.tasks)
+            .filter(([, task]) =>
+              TASK_FIELDS.some(
+                (field) => task[field] === null || task[field] === undefined
+              )
+            )
+            .map(([k]) => k);
+
+          if (remainingTasks.length > 0) {
+            const nextTask = remainingTasks[0];
+            setTaskInProgress(nextTask);
+            const options = FIELD_OPTIONS[TASK_FIELDS[0]];
+
+            console.log("Moving to next task:", nextTask);
+            console.log("Inserting first field question + options:", {
+              field: TASK_FIELDS[0],
+              options,
+            });
+
+            setMessages((prevMsgs) => [
+              ...prevMsgs,
+              {
+                type: "text",
+                role: "system",
+                content: `Vamos a continuar con la siguiente tarea: ${nextTask}. ¿Cuál es su ${TASK_FIELDS[0]}?`,
+              },
+              ...(options
+                ? [
+                    {
+                      type: "options",
+                      role: "assistant",
+                      content: { options },
+                    } as const,
+                  ]
+                : []),
+            ]);
+          } else {
+            setTaskInProgress(null);
+            setMessages((prevMsgs) => [
+              ...prevMsgs,
+              {
+                type: "text",
+                role: "system",
+                content: "Gracias. Has completado todas las tareas.",
+              },
+            ]);
+          }
+
+          return prev;
+        });
+      }
+
+      return;
     }
   } catch (error) {
     console.error("error in handleSendMessage:", error);

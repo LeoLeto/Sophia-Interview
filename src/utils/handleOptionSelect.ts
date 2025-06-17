@@ -1,14 +1,5 @@
-// utils/handleTaskOptionSelect.ts
-
 import { ChatMessage, GptFormData } from "../types";
-
-interface HandleTaskOptionSelectArgs {
-  msgIndex: number;
-  optionIndex: number;
-  messages: ChatMessage[];
-  setMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>;
-  setFormData: React.Dispatch<React.SetStateAction<GptFormData>>;
-}
+import { FIELD_OPTIONS } from "./handleSendMessage"; // Ensure this path is correct
 
 export function handleTaskOptionSelect({
   msgIndex,
@@ -16,50 +7,66 @@ export function handleTaskOptionSelect({
   messages,
   setMessages,
   setFormData,
-}: HandleTaskOptionSelectArgs) {
-  const msg = messages[msgIndex];
+  setTaskInProgress,
+  setFieldIndex,
+}: {
+  msgIndex: number;
+  optionIndex: number;
+  messages: ChatMessage[];
+  setMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>;
+  setFormData: React.Dispatch<React.SetStateAction<GptFormData>>;
+  setTaskInProgress: (taskKey: string) => void;
+  setFieldIndex: React.Dispatch<React.SetStateAction<number>>;
+}) {
+  const taskOptions = messages[msgIndex].content as { options: string[] };
+  const selectedTask = taskOptions.options[optionIndex];
 
-  if (
-    msg.type === "options" &&
-    typeof msg.content === "object" &&
-    "options" in msg.content
-  ) {
-    const selectedTask = msg.content.options[optionIndex];
-    // const newTaskId = crypto.randomUUID();
+  // Mark selected option in chat history
+  setMessages((prev) => {
+    const updated = [...prev];
+    const msg = updated[msgIndex];
+    if (msg.type === "options" && msg.content && "selected" in msg.content) {
+      msg.content.selected = optionIndex;
+    }
+    return [...updated];
+  });
 
-    setMessages((prev) => {
-      const updated = [...prev];
-      const target = updated[msgIndex];
-      if (
-        target.type === "options" &&
-        typeof target.content === "object" &&
-        "options" in target.content
-      ) {
-        target.content.selected = optionIndex;
-      }
-
-      return [
-        ...updated,
-        {
-          role: "user",
-          type: "text",
-          content: selectedTask,
-        },
-      ];
-    });
-
-    setFormData((prev) => ({
-      ...prev,
-      tasks: {
-        ...prev.tasks,
-        [selectedTask]: {
-          frequencyAndTime: null,
-          difficulty: null,
-          addedValue: null,
-          implicitPriority: null,
-          duration: null,
-        },
+  // Ensure the task exists in formData with nulls
+  setFormData((prev) => ({
+    ...prev,
+    tasks: {
+      ...prev.tasks,
+      [selectedTask]: prev.tasks[selectedTask] ?? {
+        frequency: null,
+        duration: null,
+        difficulty: null,
+        addedValue: null,
+        implicitPriority: null,
       },
-    }));
-  }
+    },
+  }));
+
+  // Set task in progress and ask for first field
+  setTaskInProgress(selectedTask);
+  setFieldIndex(0);
+
+  const options = FIELD_OPTIONS["frequency"];
+
+  setMessages((prev): ChatMessage[] => [
+    ...prev,
+    {
+      type: "text",
+      role: "system",
+      content: `Perfecto. Empecemos con la tarea "${selectedTask}". ¿Con qué frecuencia la realizas?`,
+    },
+    ...(options
+      ? [
+          {
+            type: "options" as const,
+            role: "assistant" as const,
+            content: { options },
+          },
+        ]
+      : []),
+  ]);
 }
