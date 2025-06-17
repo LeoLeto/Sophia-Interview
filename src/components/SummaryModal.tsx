@@ -3,7 +3,7 @@ import { GptFormData } from "../types";
 
 interface SummaryModalProps {
   formData: GptFormData;
-  taskInProgress: string;
+  // taskInProgress: string;
   onClose: () => void;
 }
 
@@ -34,8 +34,10 @@ const SummaryModal: React.FC<SummaryModalProps> = ({ formData, onClose }) => {
               <h4>{taskName}</h4>
               <ul>
                 <li>
-                  <strong>Frecuencia y tiempo:</strong>{" "}
-                  {task.frequencyAndTime || "Pendiente"}
+                  <strong>Frecuencia:</strong> {task.frequency || "Pendiente"}
+                </li>
+                <li>
+                  <strong>Duración:</strong> {task.duration || "Pendiente"}
                 </li>
                 <li>
                   <strong>Dificultad:</strong> {task.difficulty || "Pendiente"}

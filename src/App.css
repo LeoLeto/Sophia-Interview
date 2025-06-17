@@ -304,5 +304,9 @@ strong {
     display  : flex;
     flex-wrap: wrap;
     gap      : 1rem;
+    padding  : 1rem;
+}
 
+.optionsContainer.optionButton {
+    text-align: start;
 }

@@ -1,5 +1,6 @@
 import { ChatMessage, GptFormData } from "../types";
 import { fetchBotResponse } from "./fetchBotResponse";
+import { fetchTaskFinder } from "./fetchTasks";
 
 export const handleSendMessage = async (
   newMessage: string,
@@ -15,6 +16,7 @@ export const handleSendMessage = async (
   userId: string,
   indexChatProgress: number,
   setIndexChatProgress: React.Dispatch<React.SetStateAction<number>>
+  // setJobTasks: React.Dispatch<React.SetStateAction<string[]>>
 ) => {
   const userMsg: ChatMessage = {
     type: "text",
@@ -25,9 +27,20 @@ export const handleSendMessage = async (
   setMessages((prev) => [...prev, userMsg]);
   setLoading(true);
 
+  // ONLY UPDATES NAME AND POSITION IF THEY HAVE VALID VALUES
+  const keepIfValid = <T>(incoming: T | undefined | null, existing: T): T =>
+    typeof incoming === "string" && incoming.trim() !== ""
+      ? incoming
+      : existing;
+
   try {
     // USER INPUTS NAME
     if (indexChatProgress == 1) {
+      setFormData((prev) => ({
+        ...prev,
+        name: keepIfValid(newMessage, prev.name),
+      }));
+
       setMessages((prev) => [
         ...prev,
         {
@@ -43,29 +56,41 @@ export const handleSendMessage = async (
     }
     // USER INPUTS COMPANY POSITION
     if (indexChatProgress == 2) {
-      // 🟢 TODO: ADD HERE OPENAI ASSISTANT TO GET ROLE-RELATED TASKS
-      setMessages((prev) => [
+      setFormData((prev) => ({
         ...prev,
-        {
-          type: "text",
-          role: "system",
-          content:
-            "He seleccionado 5 de las tareas más comunes de un vendedor; escoge la tarea que deseas optimizar o escribe una diferente si no se encuentra entre las opciones",
-        },
-        {
-          role: "assistant",
-          type: "options",
-          content: {
-            options: [
-              "Option 1",
-              "Option 2",
-              "Option 3",
-              "Option 4",
-              "Option 5",
-            ],
-          },
-        },
-      ]);
+        position: keepIfValid(newMessage, prev.position),
+      }));
+
+      try {
+        const result = await fetchTaskFinder(newMessage);
+        if (result.found) {
+          console.log("Tasks:", result.tasks);
+          // setJobTasks(result.tasks);
+          setMessages((prev) => [
+            ...prev,
+            {
+              type: "text",
+              role: "system",
+              content: `He seleccionado 5 de las tareas más comunes de un ${newMessage}; escoge la tarea que deseas optimizar o escribe una diferente si no se encuentra entre las opciones`,
+            },
+            {
+              role: "assistant",
+              type: "options",
+              content: {
+                options: result.tasks,
+              },
+            },
+          ]);
+        } else {
+          console.warn("Not found:", result.reason);
+        }
+      } catch (err) {
+        if (err instanceof Error) {
+          console.error("Request failed:", err.message);
+        } else {
+          console.error("Request failed:", err);
+        }
+      }
 
       setIndexChatProgress(3);
 
@@ -117,12 +142,6 @@ export const handleSendMessage = async (
               )
             )
           : {};
-
-      // ONLY UPDATES NAME AND POSITION IF THEY HAVE VALID VALUES
-      const keepIfValid = <T>(incoming: T | undefined | null, existing: T): T =>
-        typeof incoming === "string" && incoming.trim() !== ""
-          ? incoming
-          : existing;
 
       setFormData((prev) => ({
         ...prev,

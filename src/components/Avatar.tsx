@@ -10,7 +10,7 @@ const Avatar = ({ isSpeechEnabled, setIsSpeechEnabled }: AvatarProps) => {
 
   return (
     <div className="avatarContainer">
-      <img src="src/assets/avatar_5.png" alt="avatar" />
+      <img src="src/assets/avatar_6.png" alt="avatar" />
       <button
         style={{ zIndex: "1" }}
         onClick={handleToggleSpeech}
