@@ -11,7 +11,7 @@ export function handleTaskOptionSelect({
   setFormData,
   taskInProgress,
   setTaskInProgress,
-  indexCurrentTaskField,
+  // indexCurrentTaskField,
   setindexCurrentTaskField,
 }: {
   msgIndex: number;
@@ -24,11 +24,11 @@ export function handleTaskOptionSelect({
   indexCurrentTaskField: number;
   setindexCurrentTaskField: React.Dispatch<React.SetStateAction<number>>;
 }) {
-  console.log("[handleTaskOptionSelect] triggered", {
-    msgIndex,
-    optionIndex,
-    taskInProgress,
-  });
+  // console.log("[handleTaskOptionSelect] triggered", {
+  //   msgIndex,
+  //   optionIndex,
+  //   taskInProgress,
+  // });
 
   const optionMessage = messages[msgIndex];
 
@@ -43,6 +43,7 @@ export function handleTaskOptionSelect({
   }
 
   const field = optionMessage.meta.field;
+  console.log(" field: ", field);
   const selectedOption = (optionMessage.content as { options: string[] })
     .options[optionIndex];
 
@@ -105,7 +106,7 @@ export function handleTaskOptionSelect({
   // ✅ Decide whether to continue or finish task
   sendTaskCompleteOrNext({
     taskKey: taskInProgress,
-    indexCurrentTaskField,
+    fieldKey: field as keyof TaskFormData, // instead of relying on index
     setindexCurrentTaskField,
     setTaskInProgress,
     setMessages,

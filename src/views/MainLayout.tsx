@@ -5,7 +5,7 @@ import { Messages } from "../components/Messages";
 import SummaryModal from "../components/SummaryModal";
 import { ChatMessage, GptFormData } from "../types";
 import { getGenderedGreeting } from "../utils/getGenderedGreeting";
-import { handleTaskOptionSelect } from "../utils/handleOptionSelect";
+import { handleTaskOptionSelect } from "../utils/handleTaskOptionSelect";
 import { handleSendMessage } from "../utils/handleSendMessage/handleSendMessage";
 
 interface MainLayoutProps {

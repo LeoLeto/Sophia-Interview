@@ -1,10 +1,10 @@
 import { TASK_FIELDS } from "../handleSendMessage/taskTypes";
 import { askNextField } from "./askNextField";
-import { ChatMessage } from "../../types";
+import { ChatMessage, TaskFormData } from "../../types";
 
 type Args = {
   taskKey: string;
-  indexCurrentTaskField: number;
+  fieldKey: keyof TaskFormData;
   setindexCurrentTaskField: React.Dispatch<React.SetStateAction<number>>;
   setTaskInProgress: (taskKey: string | null) => void;
   setMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>;
@@ -12,24 +12,33 @@ type Args = {
 
 export function sendTaskCompleteOrNext({
   taskKey,
-  indexCurrentTaskField,
+  fieldKey,
   setindexCurrentTaskField,
   setTaskInProgress,
   setMessages,
 }: Args) {
-  if (indexCurrentTaskField < TASK_FIELDS.length - 1) {
-    const nextIndex = indexCurrentTaskField + 1;
-    const nextField = TASK_FIELDS[nextIndex];
+  const currentIndex = TASK_FIELDS.indexOf(fieldKey);
+  console.log("[sendTaskCompleteOrNext] current field:", fieldKey);
+  console.log("[sendTaskCompleteOrNext] current index:", currentIndex);
 
+  const hasMore = currentIndex < TASK_FIELDS.length - 1;
+  const nextField = TASK_FIELDS[currentIndex + 1];
+  console.log("[sendTaskCompleteOrNext] hasMore:", hasMore);
+  console.log("[sendTaskCompleteOrNext] nextField:", nextField);
+
+  if (hasMore && nextField !== "addedValue") {
+    console.log("[sendTaskCompleteOrNext] Proceeding to ask next field");
     askNextField({
       taskKey,
       fieldKey: nextField,
       setMessages,
     });
 
-    setindexCurrentTaskField(nextIndex);
+    setindexCurrentTaskField(currentIndex + 1);
   } else {
-    // ✅ All fields complete — mark task as done
+    console.log(
+      "[sendTaskCompleteOrNext] No more fields or skipping addedValue"
+    );
     setMessages((prev) => [
       ...prev,
       {

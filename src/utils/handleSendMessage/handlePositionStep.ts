@@ -14,6 +14,7 @@ export async function handlePositionStep(
 
   try {
     const result = await fetchTaskFinder(newMessage);
+    console.log("fetchTaskFinder result: ", result)
 
     if (result.found) {
       setMessages((prev) => [
