@@ -54,10 +54,11 @@ const SummaryModal: React.FC<SummaryModalProps> = ({ formData, onClose }) => {
                 </li>
                 <li>
                   <strong>Valor agregado:</strong>{" "}
-                  {typeof task.addedValue === "number"
-                    ? FIELD_OPTIONS.addedValue?.[task.addedValue] ?? "Pendiente"
+                  {task.addedValue && task.addedValue.trim() !== ""
+                    ? task.addedValue
                     : "Pendiente"}
                 </li>
+
                 <li>
                   <strong>Priorización implícita:</strong>{" "}
                   {task.implicitPriority != null

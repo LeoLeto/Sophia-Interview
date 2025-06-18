@@ -26,7 +26,7 @@ export function sendTaskCompleteOrNext({
   //   console.log("[sendTaskCompleteOrNext] hasMore:", hasMore);
   //   console.log("[sendTaskCompleteOrNext] nextField:", nextField);
 
-  if (hasMore && nextField !== "addedValue") {
+  if (hasMore) {
     // console.log("[sendTaskCompleteOrNext] Proceeding to ask next field");
     askNextField({
       taskKey,
