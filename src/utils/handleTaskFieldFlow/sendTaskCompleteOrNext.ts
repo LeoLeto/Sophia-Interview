@@ -1,50 +1,44 @@
-import { ChatMessage, GptFormData } from "../../types";
-import { FIELD_OPTIONS, TASK_FIELDS } from "../handleSendMessage/taskTypes";
-import { getNextIncompleteTask } from "./getNextIncompleteTask";
+import { TASK_FIELDS } from "../handleSendMessage/taskTypes";
+import { askNextField } from "./askNextField";
+import { ChatMessage } from "../../types";
 
-export function sendTaskCompleteOrNext(
-  setFormData: React.Dispatch<React.SetStateAction<GptFormData>>,
-  setMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>,
-  setTaskInProgress: (taskKey: string | null) => void,
-  setindexCurrentTaskField: React.Dispatch<React.SetStateAction<number>>
-) {
-  setFormData((prev) => {
-    const nextTask = getNextIncompleteTask(prev.tasks);
+type Args = {
+  taskKey: string;
+  indexCurrentTaskField: number;
+  setindexCurrentTaskField: React.Dispatch<React.SetStateAction<number>>;
+  setTaskInProgress: (taskKey: string | null) => void;
+  setMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>;
+};
 
-    if (nextTask) {
-      setTaskInProgress(nextTask);
-      setindexCurrentTaskField(0);
-      const firstField = TASK_FIELDS[0];
+export function sendTaskCompleteOrNext({
+  taskKey,
+  indexCurrentTaskField,
+  setindexCurrentTaskField,
+  setTaskInProgress,
+  setMessages,
+}: Args) {
+  if (indexCurrentTaskField < TASK_FIELDS.length - 1) {
+    const nextIndex = indexCurrentTaskField + 1;
+    const nextField = TASK_FIELDS[nextIndex];
 
-      setMessages((prevMsgs) => [
-        ...prevMsgs,
-        {
-          type: "text",
-          role: "system",
-          content: `Vamos a continuar con la siguiente tarea: ${nextTask}. ¿Cuál es su ${firstField}?`,
-        },
-        ...(FIELD_OPTIONS[firstField]
-          ? [
-              {
-                type: "options",
-                role: "assistant",
-                content: { options: FIELD_OPTIONS[firstField]! },
-              } as const,
-            ]
-          : []),
-      ]);
-    } else {
-      setTaskInProgress(null);
-      setMessages((prevMsgs) => [
-        ...prevMsgs,
-        {
-          type: "text",
-          role: "system",
-          content: "Gracias. Has completado todas las tareas.",
-        },
-      ]);
-    }
+    askNextField({
+      taskKey,
+      fieldKey: nextField,
+      setMessages,
+    });
 
-    return prev;
-  });
+    setindexCurrentTaskField(nextIndex);
+  } else {
+    // ✅ All fields complete — mark task as done
+    setMessages((prev) => [
+      ...prev,
+      {
+        type: "text",
+        role: "system",
+        content: `¡Perfecto! Hemos completado la tarea "${taskKey}".`,
+      },
+    ]);
+    setTaskInProgress(null);
+    setindexCurrentTaskField(0);
+  }
 }

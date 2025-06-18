@@ -26,22 +26,36 @@ export function handleTaskFieldsFlow({
   const currentField = TASK_FIELDS[indexCurrentTaskField];
   console.log(`[handleTaskFieldsFlow] Saving ${currentField} = ${newMessage}`);
 
-  saveCurrentTaskField(taskInProgress, currentField, newMessage, setFormData);
+  // Save current field value
+  saveCurrentTaskField({
+    taskKey: taskInProgress,
+    fieldKey: currentField,
+    selectedValue: parseInt(newMessage),
+    setFormData,
+  });
 
-  // If more fields remain for this task
-  if (indexCurrentTaskField < TASK_FIELDS.length - 1) {
-    const nextIndex = indexCurrentTaskField + 1;
-    const nextField = TASK_FIELDS[nextIndex];
-    askNextField(nextField, setMessages);
-    setindexCurrentTaskField(nextIndex);
-  } else {
-    // Task completed
-    setindexCurrentTaskField(0);
-    sendTaskCompleteOrNext(
-      setFormData,
+  const hasMoreFields = indexCurrentTaskField < TASK_FIELDS.length - 1;
+  const nextField = TASK_FIELDS[indexCurrentTaskField + 1];
+
+  // Skip 'addedValue' for now if it's next
+  const isNextFieldSkippable = nextField === "addedValue";
+
+  if (hasMoreFields && !isNextFieldSkippable) {
+    setindexCurrentTaskField(indexCurrentTaskField + 1);
+
+    askNextField({
+      fieldKey: nextField,
+      taskKey: taskInProgress,
       setMessages,
+    });
+  } else {
+    setindexCurrentTaskField(0);
+    sendTaskCompleteOrNext({
+      taskKey: taskInProgress,
+      indexCurrentTaskField,
+      setindexCurrentTaskField,
       setTaskInProgress,
-      setindexCurrentTaskField
-    );
+      setMessages,
+    });
   }
 }

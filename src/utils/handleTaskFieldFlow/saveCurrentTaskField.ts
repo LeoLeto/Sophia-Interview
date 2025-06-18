@@ -1,22 +1,24 @@
-import { GptFormData, TaskFormData } from "../../types";
+import { GptFormData } from "../../types";
 
-export function saveCurrentTaskField(
-  taskKey: string,
-  field: keyof TaskFormData,
-  value: string,
-  setFormData: React.Dispatch<React.SetStateAction<GptFormData>>
-) {
-  setFormData((prev) => {
-    const updatedTask = {
-      ...prev.tasks[taskKey],
-      [field]: value,
-    };
-    return {
-      ...prev,
-      tasks: {
-        ...prev.tasks,
-        [taskKey]: updatedTask,
+export function saveCurrentTaskField({
+  taskKey,
+  fieldKey,
+  selectedValue,
+  setFormData,
+}: {
+  taskKey: string;
+  fieldKey: keyof GptFormData["tasks"][string];
+  selectedValue: number;
+  setFormData: React.Dispatch<React.SetStateAction<GptFormData>>;
+}) {
+  setFormData((prev) => ({
+    ...prev,
+    tasks: {
+      ...prev.tasks,
+      [taskKey]: {
+        ...prev.tasks[taskKey],
+        [fieldKey]: selectedValue,
       },
-    };
-  });
+    },
+  }));
 }
