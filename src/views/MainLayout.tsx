@@ -58,6 +58,21 @@ function MainLayout({ setIsLoggedIn }: MainLayoutProps) {
     setChatProgressIndex(1);
     setLoading(false);
   };
+  const setTaskInProgressFromUserSelection = (taskOptions: string[]) => {
+    setMessages((prev) => [
+      ...prev,
+      {
+        type: "options",
+        role: "assistant", // ✅ FIXED
+        content: {
+          options: taskOptions,
+        },
+        meta: {
+          field: "task",
+        },
+      },
+    ]);
+  };
 
   const onTaskOptionSelect = (msgIndex: number, optionIndex: number) => {
     handleTaskOptionSelect({
@@ -70,6 +85,8 @@ function MainLayout({ setIsLoggedIn }: MainLayoutProps) {
       setTaskInProgress,
       indexCurrentTaskField, // add this, from state
       setindexCurrentTaskField,
+      formData,
+      setTaskInProgressFromUserSelection,
     });
   };
 
@@ -89,7 +106,9 @@ function MainLayout({ setIsLoggedIn }: MainLayoutProps) {
       // sessionId.current!,
       // userId,
       indexCurrentTaskField,
-      setindexCurrentTaskField
+      setindexCurrentTaskField,
+      formData,
+      setTaskInProgressFromUserSelection
     );
   };
 

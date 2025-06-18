@@ -14,6 +14,8 @@ export function handleTaskOptionSelect({
   setTaskInProgress,
   // indexCurrentTaskField,
   setindexCurrentTaskField,
+  formData,
+  setTaskInProgressFromUserSelection,
 }: {
   msgIndex: number;
   optionIndex: number;
@@ -24,6 +26,8 @@ export function handleTaskOptionSelect({
   setTaskInProgress: (taskKey: string | null) => void;
   indexCurrentTaskField: number;
   setindexCurrentTaskField: React.Dispatch<React.SetStateAction<number>>;
+  formData: GptFormData;
+  setTaskInProgressFromUserSelection: (options: string[]) => void;
 }) {
   // console.log("[handleTaskOptionSelect] triggered", {
   //   msgIndex,
@@ -111,5 +115,7 @@ export function handleTaskOptionSelect({
     setindexCurrentTaskField,
     setTaskInProgress,
     setMessages,
+    formData,
+    setTaskInProgressFromUserSelection,
   });
 }

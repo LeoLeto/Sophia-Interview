@@ -1,6 +1,7 @@
+import { ChatMessage, GptFormData } from "../../types";
 import { TASK_FIELDS, TaskFormData } from "../handleSendMessage/taskTypes";
 import { askNextField } from "./askNextField";
-import { ChatMessage } from "../../types";
+import { getNextIncompleteTask } from "./getNextIncompleteTask";
 
 type Args = {
   taskKey: string;
@@ -8,6 +9,8 @@ type Args = {
   setindexCurrentTaskField: React.Dispatch<React.SetStateAction<number>>;
   setTaskInProgress: (taskKey: string | null) => void;
   setMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>;
+  formData: GptFormData;
+  setTaskInProgressFromUserSelection: (options: string[]) => void;
 };
 
 export function sendTaskCompleteOrNext({
@@ -16,38 +19,66 @@ export function sendTaskCompleteOrNext({
   setindexCurrentTaskField,
   setTaskInProgress,
   setMessages,
+  formData,
+  setTaskInProgressFromUserSelection,
 }: Args) {
   const currentIndex = TASK_FIELDS.indexOf(fieldKey);
-  //   console.log("[sendTaskCompleteOrNext] current field:", fieldKey);
-  //   console.log("[sendTaskCompleteOrNext] current index:", currentIndex);
-
   const hasMore = currentIndex < TASK_FIELDS.length - 1;
-  const nextField = TASK_FIELDS[currentIndex + 1];
-  //   console.log("[sendTaskCompleteOrNext] hasMore:", hasMore);
-  //   console.log("[sendTaskCompleteOrNext] nextField:", nextField);
 
   if (hasMore) {
-    // console.log("[sendTaskCompleteOrNext] Proceeding to ask next field");
-    askNextField({
-      taskKey,
-      fieldKey: nextField,
-      setMessages,
-    });
+    const nextField = TASK_FIELDS[currentIndex + 1];
 
-    setindexCurrentTaskField(currentIndex + 1);
-  } else {
-    // console.log(
-    //   "[sendTaskCompleteOrNext] No more fields or skipping addedValue"
-    // );
+    // Only continue if the next field is not already completed
+    if (formData.tasks[taskKey]?.[nextField] == null) {
+      askNextField({
+        taskKey,
+        fieldKey: nextField,
+        setMessages,
+      });
+      setindexCurrentTaskField(currentIndex + 1);
+      return;
+    }
+  }
+
+  // All fields completed or next field already filled
+  setMessages((prev) => [
+    ...prev,
+    {
+      type: "text",
+      role: "assistant",
+      content: `¡Perfecto! Hemos completado la tarea "${taskKey}".`,
+    },
+  ]);
+  setTaskInProgress(null);
+  setindexCurrentTaskField(0);
+
+  const nextTaskKey = getNextIncompleteTask(formData.tasks);
+
+  if (nextTaskKey) {
+    const remainingTaskNames = Object.entries(formData.tasks)
+      .filter(([, task]) => TASK_FIELDS.some((f) => task[f] == null))
+      .map(([taskName]) => taskName);
+
     setMessages((prev) => [
       ...prev,
       {
         type: "text",
-        role: "system",
-        content: `¡Perfecto! Hemos completado la tarea "${taskKey}".`,
+        role: "assistant",
+        content:
+          "¿Cuál de las siguientes tareas quieres completar a continuación?",
+      },
+      {
+        type: "options",
+        role: "assistant",
+        content: {
+          options: remainingTaskNames,
+        },
+        meta: {
+          field: "taskSelection",
+        },
       },
     ]);
-    setTaskInProgress(null);
-    setindexCurrentTaskField(0);
+
+    setTaskInProgressFromUserSelection(remainingTaskNames);
   }
 }

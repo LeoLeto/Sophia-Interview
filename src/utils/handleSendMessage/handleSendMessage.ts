@@ -13,7 +13,9 @@ export const handleSendMessage = async (
   taskInProgress: string | null,
   setTaskInProgress: (taskKey: string | null) => void,
   indexCurrentTaskField: number,
-  setindexCurrentTaskField: React.Dispatch<React.SetStateAction<number>>
+  setindexCurrentTaskField: React.Dispatch<React.SetStateAction<number>>,
+  formData: GptFormData,
+  setTaskInProgressFromUserSelection: (options: string[]) => void
 ) => {
   const userMsg: ChatMessage = {
     type: "text",
@@ -52,6 +54,8 @@ export const handleSendMessage = async (
         setTaskInProgress,
         indexCurrentTaskField,
         setindexCurrentTaskField,
+        formData,
+        setTaskInProgressFromUserSelection,
       });
     }
   } catch (error) {
