@@ -18,16 +18,16 @@ export function sendTaskCompleteOrNext({
   setMessages,
 }: Args) {
   const currentIndex = TASK_FIELDS.indexOf(fieldKey);
-  console.log("[sendTaskCompleteOrNext] current field:", fieldKey);
-  console.log("[sendTaskCompleteOrNext] current index:", currentIndex);
+//   console.log("[sendTaskCompleteOrNext] current field:", fieldKey);
+//   console.log("[sendTaskCompleteOrNext] current index:", currentIndex);
 
   const hasMore = currentIndex < TASK_FIELDS.length - 1;
   const nextField = TASK_FIELDS[currentIndex + 1];
-  console.log("[sendTaskCompleteOrNext] hasMore:", hasMore);
-  console.log("[sendTaskCompleteOrNext] nextField:", nextField);
+//   console.log("[sendTaskCompleteOrNext] hasMore:", hasMore);
+//   console.log("[sendTaskCompleteOrNext] nextField:", nextField);
 
   if (hasMore && nextField !== "addedValue") {
-    console.log("[sendTaskCompleteOrNext] Proceeding to ask next field");
+    // console.log("[sendTaskCompleteOrNext] Proceeding to ask next field");
     askNextField({
       taskKey,
       fieldKey: nextField,
@@ -36,9 +36,9 @@ export function sendTaskCompleteOrNext({
 
     setindexCurrentTaskField(currentIndex + 1);
   } else {
-    console.log(
-      "[sendTaskCompleteOrNext] No more fields or skipping addedValue"
-    );
+    // console.log(
+    //   "[sendTaskCompleteOrNext] No more fields or skipping addedValue"
+    // );
     setMessages((prev) => [
       ...prev,
       {

@@ -1,5 +1,6 @@
 import React from "react";
 import { GptFormData } from "../types";
+import { FIELD_OPTIONS } from "../utils/handleSendMessage/taskTypes";
 
 interface SummaryModalProps {
   formData: GptFormData;
@@ -34,21 +35,35 @@ const SummaryModal: React.FC<SummaryModalProps> = ({ formData, onClose }) => {
               <h4>{taskName}</h4>
               <ul>
                 <li>
-                  <strong>Frecuencia:</strong> {task.frequency || "Pendiente"}
+                  <strong>Frecuencia:</strong>{" "}
+                  {task.frequency != null
+                    ? FIELD_OPTIONS.frequency?.[task.frequency] ?? "Pendiente"
+                    : "Pendiente"}
                 </li>
                 <li>
-                  <strong>Duración:</strong> {task.duration || "Pendiente"}
+                  <strong>Duración:</strong>{" "}
+                  {task.duration != null
+                    ? FIELD_OPTIONS.duration?.[task.duration] ?? "Pendiente"
+                    : "Pendiente"}
                 </li>
                 <li>
-                  <strong>Dificultad:</strong> {task.difficulty || "Pendiente"}
+                  <strong>Dificultad:</strong>{" "}
+                  {task.difficulty != null
+                    ? FIELD_OPTIONS.difficulty?.[task.difficulty] ?? "Pendiente"
+                    : "Pendiente"}
                 </li>
                 <li>
                   <strong>Valor agregado:</strong>{" "}
-                  {task.addedValue || "Pendiente"}
+                  {typeof task.addedValue === "number"
+                    ? FIELD_OPTIONS.addedValue?.[task.addedValue] ?? "Pendiente"
+                    : "Pendiente"}
                 </li>
                 <li>
                   <strong>Priorización implícita:</strong>{" "}
-                  {task.implicitPriority || "Pendiente"}
+                  {task.implicitPriority != null
+                    ? FIELD_OPTIONS.implicitPriority?.[task.implicitPriority] ??
+                      "Pendiente"
+                    : "Pendiente"}
                 </li>
               </ul>
             </div>
