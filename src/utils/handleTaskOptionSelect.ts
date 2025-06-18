@@ -1,4 +1,5 @@
-import { ChatMessage, GptFormData, TaskFormData } from "../types";
+import { ChatMessage, GptFormData } from "../types";
+import { TaskFormData } from "./handleSendMessage/taskTypes";
 import { askNextField } from "./handleTaskFieldFlow/askNextField";
 import { saveCurrentTaskField } from "./handleTaskFieldFlow/saveCurrentTaskField";
 import { sendTaskCompleteOrNext } from "./handleTaskFieldFlow/sendTaskCompleteOrNext";

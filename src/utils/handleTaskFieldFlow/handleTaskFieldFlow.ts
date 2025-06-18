@@ -26,23 +26,22 @@ export function handleTaskFieldsFlow({
   const currentField = TASK_FIELDS[indexCurrentTaskField];
   console.log(`[handleTaskFieldsFlow] Saving ${currentField} = ${newMessage}`);
 
-  // ✅ Save current field value
+  // Save the current field value
   saveCurrentTaskField({
     taskKey: taskInProgress,
     fieldKey: currentField,
-    selectedValue: parseInt(newMessage),
+    selectedValue: newMessage,
     setFormData,
   });
 
   const currentIndex = TASK_FIELDS.indexOf(currentField);
   const hasMoreFields = currentIndex < TASK_FIELDS.length - 1;
-  const nextField = TASK_FIELDS[currentIndex + 1];
 
-  // 🧩 Skip 'addedValue' if needed (temporary logic)
-  const isNextFieldSkippable = nextField === "addedValue";
+  if (hasMoreFields) {
+    const nextIndex = currentIndex + 1;
+    const nextField = TASK_FIELDS[nextIndex];
 
-  if (hasMoreFields && !isNextFieldSkippable) {
-    setindexCurrentTaskField(currentIndex + 1);
+    setindexCurrentTaskField(nextIndex);
 
     askNextField({
       taskKey: taskInProgress,
@@ -50,7 +49,7 @@ export function handleTaskFieldsFlow({
       setMessages,
     });
   } else {
-    // 🎯 Task is complete or no more fields to ask
+    // All fields done: reset index and proceed
     setindexCurrentTaskField(0);
 
     sendTaskCompleteOrNext({

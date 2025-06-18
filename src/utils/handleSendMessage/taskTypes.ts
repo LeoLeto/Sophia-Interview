@@ -1,5 +1,3 @@
-import { TaskFormData } from "../../types";
-
 export const TASK_FIELDS: (keyof TaskFormData)[] = [
   "frequency",
   "duration",
@@ -25,4 +23,12 @@ export const FIELD_OPTIONS: Partial<Record<keyof TaskFormData, string[]>> = {
   ],
   difficulty: ["Baja", "Media", "Alta"],
   implicitPriority: ["Baja", "Media", "Alta"],
+};
+
+export type TaskFormData = {
+  frequency?: null | 0 | 1 | 2 | 3 | 4;
+  duration: null | 0 | 1 | 2 | 3 | 4;
+  difficulty?: null | 0 | 1 | 2;
+  addedValue?: null | string;
+  implicitPriority?: null | 0 | 1 | 2;
 };

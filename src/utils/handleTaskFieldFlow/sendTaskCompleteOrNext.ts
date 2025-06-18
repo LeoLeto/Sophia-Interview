@@ -1,6 +1,6 @@
-import { TASK_FIELDS } from "../handleSendMessage/taskTypes";
+import { TASK_FIELDS, TaskFormData } from "../handleSendMessage/taskTypes";
 import { askNextField } from "./askNextField";
-import { ChatMessage, TaskFormData } from "../../types";
+import { ChatMessage } from "../../types";
 
 type Args = {
   taskKey: string;
@@ -18,13 +18,13 @@ export function sendTaskCompleteOrNext({
   setMessages,
 }: Args) {
   const currentIndex = TASK_FIELDS.indexOf(fieldKey);
-//   console.log("[sendTaskCompleteOrNext] current field:", fieldKey);
-//   console.log("[sendTaskCompleteOrNext] current index:", currentIndex);
+  //   console.log("[sendTaskCompleteOrNext] current field:", fieldKey);
+  //   console.log("[sendTaskCompleteOrNext] current index:", currentIndex);
 
   const hasMore = currentIndex < TASK_FIELDS.length - 1;
   const nextField = TASK_FIELDS[currentIndex + 1];
-//   console.log("[sendTaskCompleteOrNext] hasMore:", hasMore);
-//   console.log("[sendTaskCompleteOrNext] nextField:", nextField);
+  //   console.log("[sendTaskCompleteOrNext] hasMore:", hasMore);
+  //   console.log("[sendTaskCompleteOrNext] nextField:", nextField);
 
   if (hasMore && nextField !== "addedValue") {
     // console.log("[sendTaskCompleteOrNext] Proceeding to ask next field");

@@ -1,6 +1,6 @@
 // src/utils/messageBuilders.ts
-import { ChatMessage, TaskFormData } from "../../types";
-import { FIELD_OPTIONS } from "./taskTypes";
+import { ChatMessage } from "../../types";
+import { FIELD_OPTIONS, TaskFormData } from "./taskTypes";
 
 export function insertTaskFieldPrompt(
   field: keyof TaskFormData,

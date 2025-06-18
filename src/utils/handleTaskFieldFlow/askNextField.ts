@@ -1,46 +1,74 @@
-import { ChatMessage, TaskFormData } from "../../types";
+import { ChatMessage } from "../../types";
 import { FIELD_OPTIONS } from "../handleSendMessage/taskTypes";
+import { getPromptForField } from "./getPromptForField";
 
-export function askNextField({
-  fieldKey,
-  taskKey,
-  setMessages,
-}: {
-  fieldKey: keyof TaskFormData;
+type Args = {
+  fieldKey: keyof typeof FIELD_OPTIONS | "addedValue" | "implicitPriority";
   taskKey: string;
   setMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>;
-}) {
+};
+
+export function askNextField({ fieldKey, taskKey, setMessages }: Args) {
+  const message = getPromptForField(fieldKey, taskKey);
+
+  // Text input for addedValue
+  if (fieldKey === "addedValue") {
+    setMessages((prev) => [
+      ...prev,
+      {
+        type: "text",
+        role: "assistant",
+        content: message,
+      },
+    ]);
+    return;
+  }
+
+  // Options for implicitPriority
+  if (fieldKey === "implicitPriority") {
+    setMessages((prev) => [
+      ...prev,
+      {
+        type: "text",
+        role: "assistant",
+        content: message,
+      },
+      {
+        type: "options",
+        role: "assistant",
+        content: {
+          options: ["Baja", "Media", "Alta"],
+        },
+        meta: {
+          field: "implicitPriority",
+        },
+      },
+    ]);
+    return;
+  }
+
+  // Standard options flow
   const options = FIELD_OPTIONS[fieldKey];
-
-  if (!options) return;
-
-  setMessages((prev) => [
-    ...prev,
-    {
-      type: "text",
-      role: "system",
-      content: getPromptForField(fieldKey, taskKey),
-    },
-    {
-      type: "options",
-      role: "assistant",
-      content: { options },
-      meta: { field: fieldKey },
-    },
-  ]);
-}
-
-function getPromptForField(field: keyof TaskFormData, task: string): string {
-  switch (field) {
-    case "frequency":
-      return `¿Con qué frecuencia realizas la tarea "${task}"?`;
-    case "duration":
-      return `¿Cuánto tiempo tarda la tarea "${task}"?`;
-    case "difficulty":
-      return `¿Qué dificultad tiene la tarea "${task}"?`;
-    case "implicitPriority":
-      return `¿Cuál es la prioridad de la tarea "${task}"?`;
-    default:
-      return `Por favor proporciona información para la tarea "${task}".`;
+  if (options) {
+    setMessages((prev) => [
+      ...prev,
+      {
+        type: "text",
+        role: "assistant",
+        content: message,
+      },
+      {
+        type: "options",
+        role: "assistant",
+        content: {
+          options,
+        },
+        meta: {
+          field: fieldKey,
+        },
+      },
+    ]);
+  } else {
+    console.warn(`[askNextField] No options defined for field: ${fieldKey}`);
   }
 }
