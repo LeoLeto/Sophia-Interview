@@ -22,6 +22,7 @@ function MainLayout({ setIsLoggedIn }: MainLayoutProps) {
   const [taskInProgress, setTaskInProgress] = useState<string | null>(null);
   const [indexIdentityStep, setChatProgressIndex] = useState<number>(0);
   const [indexCurrentTaskField, setindexCurrentTaskField] = useState(0);
+  const [fetchedTasks, setFetchedTasks] = useState<string[]>([]);
 
   // const [jobTasks, setJobTastks] = useState<string[]>([]);
 
@@ -58,21 +59,22 @@ function MainLayout({ setIsLoggedIn }: MainLayoutProps) {
     setChatProgressIndex(1);
     setLoading(false);
   };
-  const setTaskInProgressFromUserSelection = (taskOptions: string[]) => {
-    setMessages((prev) => [
-      ...prev,
-      {
-        type: "options",
-        role: "assistant", // ✅ FIXED
-        content: {
-          options: taskOptions,
-        },
-        meta: {
-          field: "task",
-        },
-      },
-    ]);
-  };
+
+  // const setTaskInProgressFromUserSelection = (taskOptions: string[]) => {
+  //   setMessages((prev) => [
+  //     ...prev,
+  //     {
+  //       type: "options",
+  //       role: "assistant", // ✅ FIXED
+  //       content: {
+  //         options: taskOptions,
+  //       },
+  //       meta: {
+  //         field: "task",
+  //       },
+  //     },
+  //   ]);
+  // };
 
   const onTaskOptionSelect = (msgIndex: number, optionIndex: number) => {
     handleTaskOptionSelect({
@@ -86,7 +88,8 @@ function MainLayout({ setIsLoggedIn }: MainLayoutProps) {
       indexCurrentTaskField, // add this, from state
       setindexCurrentTaskField,
       formData,
-      setTaskInProgressFromUserSelection,
+      // setTaskInProgressFromUserSelection,
+      fetchedTasks,
     });
   };
 
@@ -108,7 +111,9 @@ function MainLayout({ setIsLoggedIn }: MainLayoutProps) {
       indexCurrentTaskField,
       setindexCurrentTaskField,
       formData,
-      setTaskInProgressFromUserSelection
+      // setTaskInProgressFromUserSelection,
+      setFetchedTasks,
+      fetchedTasks
     );
   };
 

@@ -5,7 +5,8 @@ export async function handlePositionStep(
   newMessage: string,
   setMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>,
   setFormData: React.Dispatch<React.SetStateAction<GptFormData>>,
-  setindexIdentityStep: React.Dispatch<React.SetStateAction<number>>
+  setindexIdentityStep: React.Dispatch<React.SetStateAction<number>>,
+  setFetchedTasks: React.Dispatch<React.SetStateAction<string[]>>
 ) {
   setFormData((prev) => ({
     ...prev,
@@ -14,9 +15,10 @@ export async function handlePositionStep(
 
   try {
     const result = await fetchTaskFinder(newMessage);
-    console.log("fetchTaskFinder result: ", result)
+    console.log("fetchTaskFinder result: ", result);
 
     if (result.found) {
+      setFetchedTasks(result.tasks);
       setMessages((prev) => [
         ...prev,
         {

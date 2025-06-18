@@ -13,7 +13,8 @@ type HandlerArgs = {
   indexCurrentTaskField: number;
   setindexCurrentTaskField: React.Dispatch<React.SetStateAction<number>>;
   formData: GptFormData;
-  setTaskInProgressFromUserSelection: (options: string[]) => void;
+  // setTaskInProgressFromUserSelection: (options: string[]) => void;
+  fetchedTasks: string[];
 };
 
 export function handleTaskFieldsFlow({
@@ -25,7 +26,8 @@ export function handleTaskFieldsFlow({
   indexCurrentTaskField,
   setindexCurrentTaskField,
   formData,
-  setTaskInProgressFromUserSelection,
+  // setTaskInProgressFromUserSelection,
+  fetchedTasks,
 }: HandlerArgs) {
   const currentField = TASK_FIELDS[indexCurrentTaskField];
   console.log(`[handleTaskFieldsFlow] Saving ${currentField} = ${newMessage}`);
@@ -63,7 +65,8 @@ export function handleTaskFieldsFlow({
       setTaskInProgress,
       setMessages,
       formData,
-      setTaskInProgressFromUserSelection,
+      // setTaskInProgressFromUserSelection,
+      fetchedTasks,
     });
   }
 }

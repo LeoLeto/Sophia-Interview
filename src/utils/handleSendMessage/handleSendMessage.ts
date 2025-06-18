@@ -15,7 +15,9 @@ export const handleSendMessage = async (
   indexCurrentTaskField: number,
   setindexCurrentTaskField: React.Dispatch<React.SetStateAction<number>>,
   formData: GptFormData,
-  setTaskInProgressFromUserSelection: (options: string[]) => void
+  // setTaskInProgressFromUserSelection: (options: string[]) => void,
+  setFetchedTasks: React.Dispatch<React.SetStateAction<string[]>>,
+  fetchedTasks: string[]
 ) => {
   const userMsg: ChatMessage = {
     type: "text",
@@ -41,7 +43,8 @@ export const handleSendMessage = async (
         newMessage,
         setMessages,
         setFormData,
-        setindexIdentityStep
+        setindexIdentityStep,
+        setFetchedTasks
       );
     }
 
@@ -55,7 +58,8 @@ export const handleSendMessage = async (
         indexCurrentTaskField,
         setindexCurrentTaskField,
         formData,
-        setTaskInProgressFromUserSelection,
+        // setTaskInProgressFromUserSelection,
+        fetchedTasks,
       });
     }
   } catch (error) {

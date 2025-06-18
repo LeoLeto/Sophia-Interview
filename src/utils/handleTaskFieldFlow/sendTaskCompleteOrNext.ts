@@ -1,7 +1,6 @@
 import { ChatMessage, GptFormData } from "../../types";
 import { TASK_FIELDS, TaskFormData } from "../handleSendMessage/taskTypes";
 import { askNextField } from "./askNextField";
-import { getNextIncompleteTask } from "./getNextIncompleteTask";
 
 type Args = {
   taskKey: string;
@@ -10,7 +9,8 @@ type Args = {
   setTaskInProgress: (taskKey: string | null) => void;
   setMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>;
   formData: GptFormData;
-  setTaskInProgressFromUserSelection: (options: string[]) => void;
+//   setTaskInProgressFromUserSelection: (options: string[]) => void;
+  fetchedTasks: string[];
 };
 
 export function sendTaskCompleteOrNext({
@@ -20,7 +20,8 @@ export function sendTaskCompleteOrNext({
   setTaskInProgress,
   setMessages,
   formData,
-  setTaskInProgressFromUserSelection,
+//   setTaskInProgressFromUserSelection,
+  fetchedTasks,
 }: Args) {
   const currentIndex = TASK_FIELDS.indexOf(fieldKey);
   const hasMore = currentIndex < TASK_FIELDS.length - 1;
@@ -52,13 +53,13 @@ export function sendTaskCompleteOrNext({
   setTaskInProgress(null);
   setindexCurrentTaskField(0);
 
-  const nextTaskKey = getNextIncompleteTask(formData.tasks);
+  // Get all remaining incomplete tasks (excluding current)
+  const remainingTaskNames = fetchedTasks.filter(
+    (taskName) => !(taskName in formData.tasks)
+  );
 
-  if (nextTaskKey) {
-    const remainingTaskNames = Object.entries(formData.tasks)
-      .filter(([, task]) => TASK_FIELDS.some((f) => task[f] == null))
-      .map(([taskName]) => taskName);
-
+  if (remainingTaskNames.length > 0) {
+    console.log("remainingTaskNames: ", remainingTaskNames);
     setMessages((prev) => [
       ...prev,
       {
@@ -79,6 +80,17 @@ export function sendTaskCompleteOrNext({
       },
     ]);
 
-    setTaskInProgressFromUserSelection(remainingTaskNames);
+    // setTaskInProgressFromUserSelection(remainingTaskNames);
+  } else {
+    setMessages((prev) => [
+      ...prev,
+      {
+        type: "text",
+        role: "assistant",
+        content: "¡Felicidades! Has completado todas las tareas.",
+      },
+    ]);
+    setTaskInProgress(null);
+    setindexCurrentTaskField(0);
   }
 }
