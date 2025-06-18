@@ -6,7 +6,7 @@ import SummaryModal from "../components/SummaryModal";
 import { ChatMessage, GptFormData } from "../types";
 import { getGenderedGreeting } from "../utils/getGenderedGreeting";
 import { handleTaskOptionSelect } from "../utils/handleOptionSelect";
-import { handleSendMessage } from "../utils/handleSendMessage";
+import { handleSendMessage } from "../utils/handleSendMessage/handleSendMessage";
 
 interface MainLayoutProps {
   setIsLoggedIn: (value: boolean) => void;
@@ -20,8 +20,8 @@ function MainLayout({ setIsLoggedIn }: MainLayoutProps) {
   const [showSummary, setShowSummary] = useState(false);
   const [isChatInitiated, setIsChatInitiated] = useState<boolean>(false);
   const [taskInProgress, setTaskInProgress] = useState<string | null>(null);
-  const [indexChatProgress, setChatProgressIndex] = useState<number>(0);
-  const [fieldIndex, setFieldIndex] = useState(0);
+  const [indexIdentityStep, setChatProgressIndex] = useState<number>(0);
+  const [indexCurrentTaskField, setindexCurrentTaskField] = useState(0);
 
   // const [jobTasks, setJobTastks] = useState<string[]>([]);
 
@@ -68,8 +68,8 @@ function MainLayout({ setIsLoggedIn }: MainLayoutProps) {
       setFormData,
       taskInProgress, // add this, from state
       setTaskInProgress,
-      fieldIndex, // add this, from state
-      setFieldIndex,
+      indexCurrentTaskField, // add this, from state
+      setindexCurrentTaskField,
     });
   };
 
@@ -82,14 +82,14 @@ function MainLayout({ setIsLoggedIn }: MainLayoutProps) {
       // isSpeechEnabled,
       // formData,
       setFormData,
-      indexChatProgress,
+      indexIdentityStep,
       setChatProgressIndex,
       taskInProgress,
       setTaskInProgress,
       // sessionId.current!,
       // userId,
-      fieldIndex,
-      setFieldIndex
+      indexCurrentTaskField,
+      setindexCurrentTaskField
     );
   };
 
@@ -132,7 +132,7 @@ function MainLayout({ setIsLoggedIn }: MainLayoutProps) {
           setInputValue={setInputValue}
           loading={loading}
           isChatInitiated={isChatInitiated}
-          indexChatProgress={indexChatProgress}
+          indexIdentityStep={indexIdentityStep}
         />
       </span>
 

@@ -1,5 +1,5 @@
 import { ChatMessage, GptFormData } from "../types";
-import { FIELD_OPTIONS } from "./handleSendMessage";
+import { FIELD_OPTIONS } from "./handleSendMessage/taskTypes";
 
 export function handleTaskOptionSelect({
   msgIndex,
@@ -9,8 +9,8 @@ export function handleTaskOptionSelect({
   setFormData,
   taskInProgress,
   setTaskInProgress,
-  fieldIndex,
-  setFieldIndex,
+  indexCurrentTaskField,
+  setindexCurrentTaskField,
 }: {
   msgIndex: number;
   optionIndex: number;
@@ -19,8 +19,8 @@ export function handleTaskOptionSelect({
   setFormData: React.Dispatch<React.SetStateAction<GptFormData>>;
   taskInProgress: string | null;
   setTaskInProgress: (taskKey: string) => void;
-  fieldIndex: number;
-  setFieldIndex: React.Dispatch<React.SetStateAction<number>>;
+  indexCurrentTaskField: number;
+  setindexCurrentTaskField: React.Dispatch<React.SetStateAction<number>>;
 }) {
   const optionMessage = messages[msgIndex];
   console.log("optionMessage at index", msgIndex, optionMessage);
@@ -70,7 +70,7 @@ export function handleTaskOptionSelect({
     }));
 
     setTaskInProgress(selectedTask);
-    setFieldIndex(0);
+    setindexCurrentTaskField(0);
 
     // Ask for first field (frequency)
     const options = FIELD_OPTIONS["frequency"] ?? []; // fallback to empty array if undefined
@@ -121,17 +121,17 @@ export function handleTaskOptionSelect({
       "implicitPriority",
     ];
 
-    let nextFieldIndex = fieldIndex + 1;
+    let nextindexCurrentTaskField = indexCurrentTaskField + 1;
 
     // Skip addedValue for now or handle text input differently
-    if (fieldsOrder[nextFieldIndex] === "addedValue") {
-      nextFieldIndex++;
+    if (fieldsOrder[nextindexCurrentTaskField] === "addedValue") {
+      nextindexCurrentTaskField++;
     }
 
-    if (nextFieldIndex >= fieldsOrder.length) {
+    if (nextindexCurrentTaskField >= fieldsOrder.length) {
       // Done all fields for this task
       setTaskInProgress("");
-      setFieldIndex(0);
+      setindexCurrentTaskField(0);
 
       // TODO: Ask user if they want to select another task or finish
       setMessages((prev) => [
@@ -143,8 +143,8 @@ export function handleTaskOptionSelect({
         },
       ]);
     } else {
-      const nextField = fieldsOrder[nextFieldIndex];
-      setFieldIndex(nextFieldIndex);
+      const nextField = fieldsOrder[nextindexCurrentTaskField];
+      setindexCurrentTaskField(nextindexCurrentTaskField);
 
       const options = FIELD_OPTIONS[nextField];
 
