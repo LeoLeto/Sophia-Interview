@@ -15,6 +15,7 @@ export type ChatMessage =
       };
       meta?: {
         field: string; // e.g. "task", "frequency", "duration", etc.
+        taskKey?: string;
       };
     };
 

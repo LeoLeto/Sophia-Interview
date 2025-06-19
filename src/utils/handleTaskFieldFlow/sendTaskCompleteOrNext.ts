@@ -9,7 +9,7 @@ type Args = {
   setTaskInProgress: (taskKey: string | null) => void;
   setMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>;
   formData: GptFormData;
-//   setTaskInProgressFromUserSelection: (options: string[]) => void;
+  //   setTaskInProgressFromUserSelection: (options: string[]) => void;
   fetchedTasks: string[];
 };
 
@@ -20,7 +20,7 @@ export function sendTaskCompleteOrNext({
   setTaskInProgress,
   setMessages,
   formData,
-//   setTaskInProgressFromUserSelection,
+  //   setTaskInProgressFromUserSelection,
   fetchedTasks,
 }: Args) {
   const currentIndex = TASK_FIELDS.indexOf(fieldKey);
@@ -75,7 +75,7 @@ export function sendTaskCompleteOrNext({
           options: remainingTaskNames,
         },
         meta: {
-          field: "taskSelection",
+          field: "task",
         },
       },
     ]);

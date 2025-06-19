@@ -255,6 +255,8 @@ button:hover {
     width        : 90%;
     box-shadow   : 0 0 20px rgba(0, 0, 0, 0.3);
     position     : relative;
+    overflow     : auto;
+    height       : 90%;
 }
 
 .modalContent h2 {

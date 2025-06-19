@@ -41,6 +41,7 @@ export function askNextField({ fieldKey, taskKey, setMessages }: Args) {
         },
         meta: {
           field: "implicitPriority",
+          taskKey,
         },
       },
     ]);
@@ -65,6 +66,7 @@ export function askNextField({ fieldKey, taskKey, setMessages }: Args) {
         },
         meta: {
           field: fieldKey,
+          taskKey, // ✅ Include this here
         },
       },
     ]);

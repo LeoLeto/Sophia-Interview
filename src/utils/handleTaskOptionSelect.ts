@@ -96,15 +96,18 @@ export function handleTaskOptionSelect({
     return;
   }
 
-  // ✅ For other fields (frequency, duration, etc.)
-  if (!taskInProgress) {
-    console.error("No task in progress when selecting field option");
-    return;
-  }
+const currentTask =
+  taskInProgress ?? optionMessage.meta?.taskKey ?? null;
+
+if (!currentTask) {
+  console.error("No task in progress and no taskKey in meta");
+  return;
+}
+
 
   // ✅ Save selected value for current field
   saveCurrentTaskField({
-    taskKey: taskInProgress,
+    taskKey: currentTask,
     fieldKey: field as keyof TaskFormData,
     selectedValue: optionIndex,
     setFormData,
@@ -112,7 +115,7 @@ export function handleTaskOptionSelect({
 
   // ✅ Decide whether to continue or finish task
   sendTaskCompleteOrNext({
-    taskKey: taskInProgress,
+    taskKey: currentTask,
     fieldKey: field as keyof TaskFormData, // instead of relying on index
     setindexCurrentTaskField,
     setTaskInProgress,
