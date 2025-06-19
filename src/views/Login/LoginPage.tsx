@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react";
 import styles from "./LoginPage.module.css";
 import useLogin from "./useLogin";
 
+import cover1 from "../assets/cover.jpg";
+import cover2 from "../assets/cover2.jpg";
+
 type LoginPageProps = {
   setIsLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
 };
@@ -13,7 +16,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ setIsLoggedIn }) => {
 
   // Set random image only once on initial load
   useEffect(() => {
-    const images = ["src/assets/cover.jpg", "src/assets/cover2.jpg"];
+    const images = [cover1, cover2];
     const selectedImage = images[Math.floor(Math.random() * images.length)];
     setRandomImage(selectedImage);
 

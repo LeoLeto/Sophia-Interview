@@ -1,3 +1,5 @@
+import avatarImg from "../assets/avatar_6.png";
+
 interface AvatarProps {
   isSpeechEnabled: boolean;
   setIsSpeechEnabled: React.Dispatch<React.SetStateAction<boolean>>;
@@ -10,7 +12,7 @@ const Avatar = ({ isSpeechEnabled, setIsSpeechEnabled }: AvatarProps) => {
 
   return (
     <div className="avatarContainer">
-      <img src="src/assets/avatar_6.png" alt="avatar" />
+      <img src={avatarImg} alt="avatar" />
       <button
         style={{ zIndex: "1" }}
         onClick={handleToggleSpeech}
