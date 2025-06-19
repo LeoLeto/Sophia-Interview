@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import styles from "./LoginPage.module.css";
 import useLogin from "./useLogin";
 
-import cover1 from "../assets/cover.jpg";
-import cover2 from "../assets/cover2.jpg";
+import cover1 from "../../assets/cover.jpg";
+import cover2 from "../../assets/cover2.jpg";
 
 type LoginPageProps = {
   setIsLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
