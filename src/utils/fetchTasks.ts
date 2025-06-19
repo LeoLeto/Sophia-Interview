@@ -15,7 +15,10 @@ export async function fetchTaskFinder(
 ): Promise<TaskFinderResponse> {
   const res = await fetch(import.meta.env.VITE_API_URL + "IOTaskFinder", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      "x-functions-key": import.meta.env.AZURE,
+    },
     body: JSON.stringify({ job }),
   });
 
