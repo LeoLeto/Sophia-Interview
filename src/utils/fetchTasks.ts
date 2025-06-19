@@ -17,7 +17,7 @@ export async function fetchTaskFinder(
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "x-functions-key": import.meta.env.AZURE,
+      "x-functions-key": import.meta.env.AZURE_FUNCTION_KEY,
     },
     body: JSON.stringify({ job }),
   });
