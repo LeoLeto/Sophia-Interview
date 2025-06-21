@@ -24,8 +24,6 @@ function MainLayout({ setIsLoggedIn }: MainLayoutProps) {
   const [indexCurrentTaskField, setindexCurrentTaskField] = useState(0);
   const [fetchedTasks, setFetchedTasks] = useState<string[]>([]);
 
-  // const [jobTasks, setJobTastks] = useState<string[]>([]);
-
   const [formData, setFormData] = useState<GptFormData>({
     name: null,
     position: null,

@@ -2,6 +2,7 @@ import { handleNameStep } from "./handleNameStep";
 import { handlePositionStep } from "./handlePositionStep";
 import { ChatMessage, GptFormData } from "../../types";
 import { handleTaskFieldsFlow } from "../handleTaskFieldFlow/handleTaskFieldFlow";
+import { askNextField } from "../handleTaskFieldFlow/askNextField";
 
 export const handleSendMessage = async (
   newMessage: string,
@@ -46,6 +47,38 @@ export const handleSendMessage = async (
         setindexIdentityStep,
         setFetchedTasks
       );
+    }
+
+    if (indexIdentityStep === 3 && !taskInProgress) {
+      // The user typed a task manually instead of selecting one
+      const customTask = newMessage.trim();
+
+      if (!customTask) return;
+
+      setFormData((prev) => ({
+        ...prev,
+        tasks: {
+          ...prev.tasks,
+          [customTask]: {
+            frequency: null,
+            duration: null,
+            difficulty: null,
+            addedValue: null,
+            implicitPriority: null,
+          },
+        },
+      }));
+
+      setTaskInProgress(customTask);
+      setindexCurrentTaskField(0);
+
+      askNextField({
+        taskKey: customTask,
+        fieldKey: "frequency",
+        setMessages,
+      });
+
+      return;
     }
 
     if (taskInProgress) {
