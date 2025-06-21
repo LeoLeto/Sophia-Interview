@@ -58,10 +58,18 @@ export function handleTaskOptionSelect({
   setMessages((prev) => {
     const updated = [...prev];
     const msg = updated[msgIndex];
-    if (msg.type === "options" && msg.content && "selected" in msg.content) {
-      msg.content.selected = optionIndex;
+
+    if (msg.type === "options") {
+      updated[msgIndex] = {
+        ...msg,
+        content: {
+          ...msg.content,
+          selected: optionIndex,
+        },
+      };
     }
-    return [...updated];
+
+    return updated;
   });
 
   if (field === "task") {
@@ -96,14 +104,12 @@ export function handleTaskOptionSelect({
     return;
   }
 
-const currentTask =
-  taskInProgress ?? optionMessage.meta?.taskKey ?? null;
+  const currentTask = taskInProgress ?? optionMessage.meta?.taskKey ?? null;
 
-if (!currentTask) {
-  console.error("No task in progress and no taskKey in meta");
-  return;
-}
-
+  if (!currentTask) {
+    console.error("No task in progress and no taskKey in meta");
+    return;
+  }
 
   // ✅ Save selected value for current field
   saveCurrentTaskField({
