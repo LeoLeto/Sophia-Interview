@@ -3,8 +3,20 @@ import { TaskFormData } from "./handleSendMessage/taskTypes";
 import { askNextField } from "./handleTaskFieldFlow/askNextField";
 import { saveCurrentTaskField } from "./handleTaskFieldFlow/saveCurrentTaskField";
 import { sendTaskCompleteOrNext } from "./handleTaskFieldFlow/sendTaskCompleteOrNext";
+import { fetchTasksForResolvedOccupation } from "./fetchTasksForResolvedOccupation";
 
-export function handleTaskOptionSelect({
+interface OptionMeta {
+  field: string;
+  taskKey?: string;
+  originals?: string[];
+}
+
+type OptionsContent = {
+  options: string[];
+  selected?: number;
+};
+
+export async function handleTaskOptionSelect({
   msgIndex,
   optionIndex,
   messages,
@@ -12,10 +24,8 @@ export function handleTaskOptionSelect({
   setFormData,
   taskInProgress,
   setTaskInProgress,
-  // indexCurrentTaskField,
   setindexCurrentTaskField,
   formData,
-  // setTaskInProgressFromUserSelection,
   fetchedTasks,
 }: {
   msgIndex: number;
@@ -28,15 +38,8 @@ export function handleTaskOptionSelect({
   indexCurrentTaskField: number;
   setindexCurrentTaskField: React.Dispatch<React.SetStateAction<number>>;
   formData: GptFormData;
-  // setTaskInProgressFromUserSelection: (options: string[]) => void;
   fetchedTasks: string[];
 }) {
-  // console.log("[handleTaskOptionSelect] triggered", {
-  //   msgIndex,
-  //   optionIndex,
-  //   taskInProgress,
-  // });
-
   const optionMessage = messages[msgIndex];
 
   if (optionMessage.type !== "options") {
@@ -44,33 +47,81 @@ export function handleTaskOptionSelect({
     return;
   }
 
-  if (!optionMessage.meta || !optionMessage.meta.field) {
+  const meta = optionMessage.meta as OptionMeta;
+
+  if (!meta || !meta.field) {
     console.error("No meta.field found on options message");
     return;
   }
 
-  const field = optionMessage.meta.field;
-  console.log(" field: ", field);
-  const selectedOption = (optionMessage.content as { options: string[] })
-    .options[optionIndex];
+  const field = meta.field;
+  const selectedOption = (optionMessage.content as OptionsContent).options[
+    optionIndex
+  ];
 
   // ✅ Mark selected option in chat history
   setMessages((prev) => {
     const updated = [...prev];
-    const msg = updated[msgIndex];
-
-    if (msg.type === "options") {
-      updated[msgIndex] = {
-        ...msg,
-        content: {
-          ...msg.content,
-          selected: optionIndex,
-        },
-      };
+    if (updated[msgIndex].type === "options") {
+      (updated[msgIndex].content as OptionsContent).selected = optionIndex;
     }
-
     return updated;
   });
+
+  if (field === "occupationMatch") {
+    const originalOptions = meta.originals;
+    if (!originalOptions || !originalOptions[optionIndex]) {
+      console.error("No original label found for selected occupation");
+      return;
+    }
+
+    const originalLabel = originalOptions[optionIndex];
+
+    try {
+      const result = await fetchTasksForResolvedOccupation(originalLabel);
+
+      if (result.found) {
+        const safeTasks = result.tasks ?? [];
+
+        setMessages((prev) => [
+          ...prev,
+          {
+            type: "text",
+            role: "system",
+            content: `He seleccionado 5 de las tareas más comunes de un ${selectedOption}; escoge la tarea que deseas optimizar o escribe una diferente si no se encuentra entre las opciones`,
+          },
+          {
+            type: "options",
+            role: "assistant",
+            content: { options: safeTasks },
+            meta: { field: "task" },
+          },
+        ]);
+      } else {
+        setMessages((prev) => [
+          ...prev,
+          {
+            type: "text",
+            role: "system",
+            content:
+              result.reason || "No se encontraron tareas para esa ocupación.",
+          },
+        ]);
+      }
+    } catch (err) {
+      console.error("Error fetching tasks for resolved occupation:", err);
+      setMessages((prev) => [
+        ...prev,
+        {
+          type: "text",
+          role: "system",
+          content: "Ocurrió un error al buscar tareas para esa ocupación.",
+        },
+      ]);
+    }
+
+    return;
+  }
 
   if (field === "task") {
     const selectedTask = selectedOption;
@@ -104,7 +155,7 @@ export function handleTaskOptionSelect({
     return;
   }
 
-  const currentTask = taskInProgress ?? optionMessage.meta?.taskKey ?? null;
+  const currentTask = taskInProgress ?? meta.taskKey ?? null;
 
   if (!currentTask) {
     console.error("No task in progress and no taskKey in meta");
@@ -122,12 +173,11 @@ export function handleTaskOptionSelect({
   // ✅ Decide whether to continue or finish task
   sendTaskCompleteOrNext({
     taskKey: currentTask,
-    fieldKey: field as keyof TaskFormData, // instead of relying on index
+    fieldKey: field as keyof TaskFormData,
     setindexCurrentTaskField,
     setTaskInProgress,
     setMessages,
     formData,
-    // setTaskInProgressFromUserSelection,
     fetchedTasks,
   });
 }

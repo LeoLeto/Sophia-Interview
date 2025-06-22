@@ -6,17 +6,26 @@ export interface TaskFinderSuccess {
 export interface TaskFinderFailure {
   found: false;
   reason: string;
+  multiple?: false;
 }
 
-export type TaskFinderResponse = TaskFinderSuccess | TaskFinderFailure;
+export interface TaskFinderDisambiguation {
+  found: false;
+  multiple: true;
+  message: string;
+  options: string[]; // translated names for display
+  originalOptions: string[]; // original DB names for querying
+}
+
+export type TaskFinderResponse =
+  | TaskFinderSuccess
+  | TaskFinderFailure
+  | TaskFinderDisambiguation;
 
 export async function fetchTaskFinder(
   job: string
 ): Promise<TaskFinderResponse> {
-  const res = await fetch(import.meta.env.VITE_API_URL
-    // + "IOTaskFinder"
-    + "IOTaskFinderInDB"
-    , {
+  const res = await fetch(import.meta.env.VITE_API_URL + "IOTaskFinderInDB", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -31,6 +40,5 @@ export async function fetchTaskFinder(
   }
 
   const data = await res.json();
-
   return data;
 }
