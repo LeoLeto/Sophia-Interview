@@ -13,7 +13,10 @@ export type TaskFinderResponse = TaskFinderSuccess | TaskFinderFailure;
 export async function fetchTaskFinder(
   job: string
 ): Promise<TaskFinderResponse> {
-  const res = await fetch(import.meta.env.VITE_API_URL + "IOTaskFinder", {
+  const res = await fetch(import.meta.env.VITE_API_URL
+    // + "IOTaskFinder"
+    + "IOTaskFinderInDB"
+    , {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
