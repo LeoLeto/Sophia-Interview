@@ -11,7 +11,10 @@ export async function fetchTasksForResolvedOccupation(
       "Content-Type": "application/json",
       "x-functions-key": import.meta.env.VITE_FUNCTIONS_KEY_QA,
     },
-    body: JSON.stringify({ job: originalLabel }),
+    body: JSON.stringify({
+      job: originalLabel,
+      isOccupationTypedOrSelected: "selected",
+    }),
   });
 
   if (!res.ok) {

@@ -77,6 +77,8 @@ export async function handlePositionStep(
         originals: result.originalOptions,
       });
 
+      setindexIdentityStep(3);
+
       return;
     }
 

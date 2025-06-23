@@ -31,7 +31,10 @@ export async function fetchTaskFinder(
       "Content-Type": "application/json",
       "x-functions-key": import.meta.env.VITE_FUNCTIONS_KEY_QA,
     },
-    body: JSON.stringify({ job }),
+    body: JSON.stringify({
+      job: job,
+      isOccupationTypedOrSelected: "typed",
+    }),
   });
 
   if (!res.ok) {

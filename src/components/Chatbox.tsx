@@ -103,7 +103,8 @@ export function Chatbox({
     if (loading) return "Cargando...";
     if (!isChatInitiated) return "Inicia el chat para comenzar...";
     if (indexIdentityStep == 1) return "Escribe aquí tu nombre"
-    if (indexIdentityStep == 2) return "Escribe aquí el nombre de tu empresa"
+    if (indexIdentityStep == 2) return "Escribe aquí tu cargo en la empresa"
+    if (indexIdentityStep == 3) return "..."
     return "Escribe aquí tu mensaje...";
   };
 

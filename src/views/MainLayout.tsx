@@ -14,7 +14,7 @@ interface MainLayoutProps {
 
 function MainLayout({ setIsLoggedIn }: MainLayoutProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [inputValue, setInputValue] = useState<string>("");
   const [isSpeechEnabled, setIsSpeechEnabled] = useState<boolean>(false);
   const [showSummary, setShowSummary] = useState(false);
@@ -44,7 +44,7 @@ function MainLayout({ setIsLoggedIn }: MainLayoutProps) {
 
   const handleInitiateChat = async () => {
     setIsChatInitiated(true);
-    setLoading(true);
+    setIsLoading(true);
     setMessages((prev) => [
       ...prev,
       {
@@ -55,7 +55,7 @@ function MainLayout({ setIsLoggedIn }: MainLayoutProps) {
       },
     ]);
     setChatProgressIndex(1);
-    setLoading(false);
+    setIsLoading(false);
   };
 
   // const setTaskInProgressFromUserSelection = (taskOptions: string[]) => {
@@ -88,6 +88,8 @@ function MainLayout({ setIsLoggedIn }: MainLayoutProps) {
       formData,
       // setTaskInProgressFromUserSelection,
       fetchedTasks,
+      // isLoading,
+      setIsLoading
     });
   };
 
@@ -96,7 +98,7 @@ function MainLayout({ setIsLoggedIn }: MainLayoutProps) {
       newMessage,
       // messages,
       setMessages,
-      setLoading,
+      setIsLoading,
       // isSpeechEnabled,
       // formData,
       setFormData,
@@ -147,12 +149,12 @@ function MainLayout({ setIsLoggedIn }: MainLayoutProps) {
           </div>
         )}
         <Messages messages={messages} onOptionSelect={onTaskOptionSelect} />
-        {loading && <div className="spinner">⏳</div>}
+        {isLoading && <div className="spinner">⏳</div>}
         <Chatbox
           onSendMessage={handleSend}
           inputValue={inputValue}
           setInputValue={setInputValue}
-          loading={loading}
+          loading={isLoading}
           isChatInitiated={isChatInitiated}
           indexIdentityStep={indexIdentityStep}
         />

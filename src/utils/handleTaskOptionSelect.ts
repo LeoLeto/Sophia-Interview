@@ -27,6 +27,8 @@ export async function handleTaskOptionSelect({
   setindexCurrentTaskField,
   formData,
   fetchedTasks,
+  // isLoading,
+  setIsLoading,
 }: {
   msgIndex: number;
   optionIndex: number;
@@ -39,6 +41,8 @@ export async function handleTaskOptionSelect({
   setindexCurrentTaskField: React.Dispatch<React.SetStateAction<number>>;
   formData: GptFormData;
   fetchedTasks: string[];
+  // isLoading: boolean;
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const optionMessage = messages[msgIndex];
 
@@ -76,11 +80,14 @@ export async function handleTaskOptionSelect({
     }
 
     const originalLabel = originalOptions[optionIndex];
+    setIsLoading(true);
 
     try {
       const result = await fetchTasksForResolvedOccupation(originalLabel);
+      console.log(" result: ", result);
 
       if (result.found) {
+        setIsLoading(false);
         const safeTasks = result.tasks ?? [];
 
         setMessages((prev) => [
@@ -98,6 +105,7 @@ export async function handleTaskOptionSelect({
           },
         ]);
       } else {
+        setIsLoading(false);
         setMessages((prev) => [
           ...prev,
           {
@@ -110,6 +118,7 @@ export async function handleTaskOptionSelect({
       }
     } catch (err) {
       console.error("Error fetching tasks for resolved occupation:", err);
+      setIsLoading(false);
       setMessages((prev) => [
         ...prev,
         {
