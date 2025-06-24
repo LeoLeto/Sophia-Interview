@@ -50,7 +50,11 @@ export const handleSendMessage = async (
       );
     }
 
-    if (indexChatboxReference === 3 && !taskInProgress) {
+    if (
+      !taskInProgress &&
+      fetchedTasks.length > 0 &&
+      !fetchedTasks.includes(newMessage.trim())
+    ) {
       // The user typed a task manually instead of selecting one
       const customTask = newMessage.trim();
       if (!customTask) return;
