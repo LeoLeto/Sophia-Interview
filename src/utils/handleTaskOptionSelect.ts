@@ -4,6 +4,7 @@ import { askNextField } from "./handleTaskFieldFlow/askNextField";
 import { saveCurrentTaskField } from "./handleTaskFieldFlow/saveCurrentTaskField";
 import { sendTaskCompleteOrNext } from "./handleTaskFieldFlow/sendTaskCompleteOrNext";
 import { fetchTasksForResolvedOccupation } from "./fetchTasksForResolvedOccupation";
+import { showTaskSelectionMessage } from "./handleTaskFieldFlow/showTaskSelectionMessage";
 
 interface OptionMeta {
   field: string;
@@ -43,7 +44,7 @@ export async function handleTaskOptionSelect({
   setindexCurrentTaskField: React.Dispatch<React.SetStateAction<number>>;
   formData: GptFormData;
   fetchedTasks: string[];
-  setFetchedTasks: React.Dispatch<React.SetStateAction<string[]>>,
+  setFetchedTasks: React.Dispatch<React.SetStateAction<string[]>>;
   // isLoading: boolean;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
   setIndexChatboxReference: React.Dispatch<React.SetStateAction<number>>;
@@ -93,23 +94,13 @@ export async function handleTaskOptionSelect({
       if (result.found) {
         setIsLoading(false);
         const safeTasks = result.tasks ?? [];
-        setFetchedTasks(safeTasks)
-
-        setMessages((prev) => [
-          ...prev,
-          {
-            type: "text",
-            role: "system",
-            content: `He seleccionado 5 de las tareas más comunes de un ${selectedOption}; escoge la tarea que deseas optimizar o escribe una diferente si no se encuentra entre las opciones`,
-          },
-          {
-            type: "options",
-            role: "assistant",
-            content: { options: safeTasks },
-            meta: { field: "task" },
-          },
-        ]);
-        setIndexChatboxReference(4);
+        showTaskSelectionMessage({
+          title: selectedOption,
+          tasks: safeTasks,
+          setMessages,
+          setIndexChatboxReference,
+          setFetchedTasks,
+        });
       } else {
         setIsLoading(false);
         setMessages((prev) => [
