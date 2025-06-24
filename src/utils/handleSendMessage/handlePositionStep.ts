@@ -5,15 +5,16 @@ export async function handlePositionStep(
   newMessage: string,
   setMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>,
   setFormData: React.Dispatch<React.SetStateAction<GptFormData>>,
-  setindexIdentityStep: React.Dispatch<React.SetStateAction<number>>,
+  setIndexChatboxReference: React.Dispatch<React.SetStateAction<number>>,
   setFetchedTasks: React.Dispatch<React.SetStateAction<string[]>>,
-  setPendingOccupationMatch?: React.Dispatch<
-    React.SetStateAction<{
-      label: string;
-      allLabels: string[];
-      originals: string[];
-    } | null>
-  > // <-- Add this to manage disambiguation state if needed
+  // setIsChatboxEnabled: React.Dispatch<React.SetStateAction<boolean>>
+  // setPendingOccupationMatch?: React.Dispatch<
+  // React.SetStateAction<{
+  //   label: string;
+  //   allLabels: string[];
+  //   originals: string[];
+  // } | null>
+  // >, // <-- Add this to manage disambiguation state if needed
 ) {
   const jobTitle = newMessage.trim();
 
@@ -44,7 +45,7 @@ export async function handlePositionStep(
         },
       ]);
 
-      setindexIdentityStep(3);
+      setIndexChatboxReference(4);
       return;
     }
 
@@ -71,13 +72,15 @@ export async function handlePositionStep(
       ]);
 
       // Optional: store disambiguation context
-      setPendingOccupationMatch?.({
-        label: jobTitle,
-        allLabels: result.options,
-        originals: result.originalOptions,
-      });
+      // setPendingOccupationMatch?.({
+      //   label: jobTitle,
+      //   allLabels: result.options,
+      //   originals: result.originalOptions,
+      // });
 
-      setindexIdentityStep(3);
+      setIndexChatboxReference(3);
+      // console.log("DISABLING CHATBOX");
+      // setIsChatboxEnabled(false);
 
       return;
     }
@@ -104,5 +107,5 @@ export async function handlePositionStep(
     ]);
   }
 
-  setindexIdentityStep(3);
+  setIndexChatboxReference(3);
 }

@@ -4,7 +4,7 @@ export function handleNameStep(
   newMessage: string,
   setMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>,
   setFormData: React.Dispatch<React.SetStateAction<GptFormData>>,
-  setindexIdentityStep: React.Dispatch<React.SetStateAction<number>>
+  setIndexChatboxReference: React.Dispatch<React.SetStateAction<number>>
 ) {
   setFormData((prev) => ({
     ...prev,
@@ -20,5 +20,5 @@ export function handleNameStep(
     },
   ]);
 
-  setindexIdentityStep(2);
+  setIndexChatboxReference(2);
 }

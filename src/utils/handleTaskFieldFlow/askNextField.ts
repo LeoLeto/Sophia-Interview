@@ -6,9 +6,15 @@ type Args = {
   fieldKey: keyof typeof FIELD_OPTIONS | "addedValue" | "implicitPriority";
   taskKey: string;
   setMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>;
+  setIndexChatboxReference: React.Dispatch<React.SetStateAction<number>>;
 };
 
-export function askNextField({ fieldKey, taskKey, setMessages }: Args) {
+export function askNextField({
+  fieldKey,
+  taskKey,
+  setMessages,
+  setIndexChatboxReference,
+}: Args) {
   const message = getPromptForField(fieldKey, taskKey);
 
   // Text input for addedValue
@@ -21,6 +27,9 @@ export function askNextField({ fieldKey, taskKey, setMessages }: Args) {
         content: message,
       },
     ]);
+
+    setIndexChatboxReference(4);
+
     return;
   }
 
@@ -45,6 +54,9 @@ export function askNextField({ fieldKey, taskKey, setMessages }: Args) {
         },
       },
     ]);
+
+    setIndexChatboxReference(3);
+
     return;
   }
 

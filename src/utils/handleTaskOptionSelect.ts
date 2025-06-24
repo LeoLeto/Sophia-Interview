@@ -27,8 +27,10 @@ export async function handleTaskOptionSelect({
   setindexCurrentTaskField,
   formData,
   fetchedTasks,
+  setFetchedTasks,
   // isLoading,
   setIsLoading,
+  setIndexChatboxReference,
 }: {
   msgIndex: number;
   optionIndex: number;
@@ -41,8 +43,10 @@ export async function handleTaskOptionSelect({
   setindexCurrentTaskField: React.Dispatch<React.SetStateAction<number>>;
   formData: GptFormData;
   fetchedTasks: string[];
+  setFetchedTasks: React.Dispatch<React.SetStateAction<string[]>>,
   // isLoading: boolean;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  setIndexChatboxReference: React.Dispatch<React.SetStateAction<number>>;
 }) {
   const optionMessage = messages[msgIndex];
 
@@ -89,6 +93,7 @@ export async function handleTaskOptionSelect({
       if (result.found) {
         setIsLoading(false);
         const safeTasks = result.tasks ?? [];
+        setFetchedTasks(safeTasks)
 
         setMessages((prev) => [
           ...prev,
@@ -104,6 +109,7 @@ export async function handleTaskOptionSelect({
             meta: { field: "task" },
           },
         ]);
+        setIndexChatboxReference(4);
       } else {
         setIsLoading(false);
         setMessages((prev) => [
@@ -159,6 +165,7 @@ export async function handleTaskOptionSelect({
       taskKey: selectedTask,
       fieldKey: "frequency",
       setMessages,
+      setIndexChatboxReference,
     });
 
     return;
@@ -186,7 +193,8 @@ export async function handleTaskOptionSelect({
     setindexCurrentTaskField,
     setTaskInProgress,
     setMessages,
-    formData,
+    getFormData: () => formData,
     fetchedTasks,
+    setIndexChatboxReference,
   });
 }

@@ -9,8 +9,8 @@ export const handleSendMessage = async (
   setMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>,
   setLoading: React.Dispatch<React.SetStateAction<boolean>>,
   setFormData: React.Dispatch<React.SetStateAction<GptFormData>>,
-  indexIdentityStep: number,
-  setindexIdentityStep: React.Dispatch<React.SetStateAction<number>>,
+  indexChatboxReference: number,
+  setIndexChatboxReference: React.Dispatch<React.SetStateAction<number>>,
   taskInProgress: string | null,
   setTaskInProgress: (taskKey: string | null) => void,
   indexCurrentTaskField: number,
@@ -18,6 +18,7 @@ export const handleSendMessage = async (
   formData: GptFormData,
   setFetchedTasks: React.Dispatch<React.SetStateAction<string[]>>,
   fetchedTasks: string[]
+  // setIsChatboxEnabled: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
   const userMsg: ChatMessage = {
     type: "text",
@@ -29,26 +30,27 @@ export const handleSendMessage = async (
   setLoading(true);
 
   try {
-    if (indexIdentityStep === 1) {
+    if (indexChatboxReference === 1) {
       return handleNameStep(
         newMessage,
         setMessages,
         setFormData,
-        setindexIdentityStep
+        setIndexChatboxReference
       );
     }
 
-    if (indexIdentityStep === 2) {
+    if (indexChatboxReference === 2) {
       return await handlePositionStep(
         newMessage,
         setMessages,
         setFormData,
-        setindexIdentityStep,
+        setIndexChatboxReference,
         setFetchedTasks
+        // setIsChatboxEnabled
       );
     }
 
-    if (indexIdentityStep === 3 && !taskInProgress) {
+    if (indexChatboxReference === 3 && !taskInProgress) {
       // The user typed a task manually instead of selecting one
       const customTask = newMessage.trim();
       if (!customTask) return;
@@ -107,6 +109,7 @@ export const handleSendMessage = async (
         taskKey: customTask,
         fieldKey: "frequency",
         setMessages,
+        setIndexChatboxReference,
       });
 
       return;
@@ -123,6 +126,7 @@ export const handleSendMessage = async (
         setindexCurrentTaskField,
         formData,
         fetchedTasks,
+        setIndexChatboxReference,
       });
     }
   } catch (error) {

@@ -6,7 +6,8 @@ type ChatboxProps = {
   setInputValue: (value: string) => void;
   loading: boolean;
   isChatInitiated: boolean;
-  indexIdentityStep: number;
+  indexChatboxReference: number;
+  // isChatboxEnabled: boolean;
 };
 
 interface SpeechRecognitionType extends EventTarget {
@@ -43,8 +44,9 @@ export function Chatbox({
   setInputValue,
   loading,
   isChatInitiated,
-  indexIdentityStep,
-}: ChatboxProps) {
+  indexChatboxReference,
+}: // isChatboxEnabled,
+ChatboxProps) {
   const handleSend = () => {
     if (inputValue.trim() !== "") {
       onSendMessage(inputValue);
@@ -54,6 +56,9 @@ export function Chatbox({
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
+      if (indexChatboxReference === 2 || indexChatboxReference === 4) {
+        (e.target as HTMLInputElement).blur();
+      }
       handleSend();
     }
   };
@@ -102,32 +107,51 @@ export function Chatbox({
   const getPlaceholder = (): string => {
     if (loading) return "Cargando...";
     if (!isChatInitiated) return "Inicia el chat para comenzar...";
-    if (indexIdentityStep == 1) return "Escribe aquí tu nombre"
-    if (indexIdentityStep == 2) return "Escribe aquí tu cargo en la empresa"
-    if (indexIdentityStep == 3) return "..."
+    if (indexChatboxReference == 1) return "Escribe aquí tu nombre";
+    if (indexChatboxReference == 2)
+      return "Escribe aquí tu cargo en la empresa";
+    if (indexChatboxReference == 3) return "Selecciona una de las opciones";
+    if (indexChatboxReference == 4) return "Escribe aquí...";
     return "Escribe aquí tu mensaje...";
   };
 
+  const getIsChatboxEnabled = (): boolean => {
+    if (!isChatInitiated) return false;
+    if (loading) return false;
+    // INDEX CHATBOT REFERENCE:
+    // 1 "INPUT NAME"
+    // 2 "INPUT OCCUPATION"
+    // 3 "SELECT OPTION"
+    // 4 "WRITE HERE"
+    if (indexChatboxReference === 3) return false;
+    return true;
+  };
+
   return (
-    <div className={`chatboxContainer ${!isChatInitiated ? "disabled" : ""}`}>
+    <div
+      className={`chatboxContainer ${!getIsChatboxEnabled() ? "disabled" : ""}`}
+    >
       <input
         type="text"
         value={inputValue}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
         placeholder={getPlaceholder()}
-        disabled={loading || !isChatInitiated}
+        // disabled={loading || !isChatInitiated || !isChatboxEnabled}
       />
-
+      {/* <p>{indexChatboxReference}</p> */}
       <button
         onClick={listening ? handleStopDictation : handleStartDictation}
         className={`micButton ${listening ? "listening" : ""}`}
-        disabled={loading || !isChatInitiated}
+        // disabled={loading || !isChatInitiated || !isChatboxEnabled}
       >
         🎤
       </button>
 
-      <button onClick={handleSend} disabled={loading || !isChatInitiated}>
+      <button
+        onClick={handleSend}
+        // disabled={loading || !isChatInitiated || !isChatboxEnabled}
+      >
         {loading ? "..." : "Enviar"}
       </button>
     </div>

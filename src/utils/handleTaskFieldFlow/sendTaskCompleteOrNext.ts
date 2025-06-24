@@ -8,9 +8,10 @@ type Args = {
   setindexCurrentTaskField: React.Dispatch<React.SetStateAction<number>>;
   setTaskInProgress: (taskKey: string | null) => void;
   setMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>;
-  formData: GptFormData;
+  getFormData: () => GptFormData;
   //   setTaskInProgressFromUserSelection: (options: string[]) => void;
   fetchedTasks: string[];
+  setIndexChatboxReference: React.Dispatch<React.SetStateAction<number>>;
 };
 
 export function sendTaskCompleteOrNext({
@@ -19,9 +20,10 @@ export function sendTaskCompleteOrNext({
   setindexCurrentTaskField,
   setTaskInProgress,
   setMessages,
-  formData,
+  getFormData,
   //   setTaskInProgressFromUserSelection,
   fetchedTasks,
+  setIndexChatboxReference,
 }: Args) {
   const currentIndex = TASK_FIELDS.indexOf(fieldKey);
   const hasMore = currentIndex < TASK_FIELDS.length - 1;
@@ -30,11 +32,12 @@ export function sendTaskCompleteOrNext({
     const nextField = TASK_FIELDS[currentIndex + 1];
 
     // Only continue if the next field is not already completed
-    if (formData.tasks[taskKey]?.[nextField] == null) {
+    if (getFormData().tasks[taskKey]?.[nextField] == null) {
       askNextField({
         taskKey,
         fieldKey: nextField,
         setMessages,
+        setIndexChatboxReference,
       });
       setindexCurrentTaskField(currentIndex + 1);
       return;
@@ -53,9 +56,12 @@ export function sendTaskCompleteOrNext({
   setTaskInProgress(null);
   setindexCurrentTaskField(0);
 
+  console.log("fetchedTasks:", fetchedTasks);
+  console.log("formData.tasks keys:", Object.keys(getFormData().tasks));
+
   // Get all remaining incomplete tasks (excluding current)
   const remainingTaskNames = fetchedTasks.filter(
-    (taskName) => !(taskName in formData.tasks)
+    (taskName) => !(taskName in getFormData().tasks)
   );
 
   if (remainingTaskNames.length > 0) {

@@ -15,6 +15,7 @@ type HandlerArgs = {
   formData: GptFormData;
   // setTaskInProgressFromUserSelection: (options: string[]) => void;
   fetchedTasks: string[];
+  setIndexChatboxReference: React.Dispatch<React.SetStateAction<number>>;
 };
 
 export function handleTaskFieldsFlow({
@@ -28,6 +29,7 @@ export function handleTaskFieldsFlow({
   formData,
   // setTaskInProgressFromUserSelection,
   fetchedTasks,
+  setIndexChatboxReference,
 }: HandlerArgs) {
   const currentField = TASK_FIELDS[indexCurrentTaskField];
   console.log(`[handleTaskFieldsFlow] Saving ${currentField} = ${newMessage}`);
@@ -53,6 +55,7 @@ export function handleTaskFieldsFlow({
       taskKey: taskInProgress,
       fieldKey: nextField,
       setMessages,
+      setIndexChatboxReference,
     });
   } else {
     // All fields done: reset index and proceed
@@ -64,9 +67,10 @@ export function handleTaskFieldsFlow({
       setindexCurrentTaskField,
       setTaskInProgress,
       setMessages,
-      formData,
+      getFormData: () => formData,
       // setTaskInProgressFromUserSelection,
       fetchedTasks,
+      setIndexChatboxReference,
     });
   }
 }

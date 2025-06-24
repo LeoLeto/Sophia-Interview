@@ -20,9 +20,15 @@ function MainLayout({ setIsLoggedIn }: MainLayoutProps) {
   const [showSummary, setShowSummary] = useState(false);
   const [isChatInitiated, setIsChatInitiated] = useState<boolean>(false);
   const [taskInProgress, setTaskInProgress] = useState<string | null>(null);
-  const [indexIdentityStep, setChatProgressIndex] = useState<number>(0);
+  // INDEX CHATBOT REFERENCE:
+  // 1 "INPUT NAME"
+  // 2 "INPUT OCCUPATION"
+  // 3 "SELECT OPTION"
+  // 4 "WRITE HERE"
+  const [indexChatboxReference, setIndexChatboxReference] = useState<number>(1);
   const [indexCurrentTaskField, setindexCurrentTaskField] = useState(0);
   const [fetchedTasks, setFetchedTasks] = useState<string[]>([]);
+  // const [isChatboxEnabled, setIsChatboxEnabled] = useState<boolean>(true);
 
   const [formData, setFormData] = useState<GptFormData>({
     name: null,
@@ -54,7 +60,7 @@ function MainLayout({ setIsLoggedIn }: MainLayoutProps) {
           "¡Hola! Es un placer tenerte aquí. Mi objetivo hoy es conocerte mejor, entender tu rol, las tareas que realizas y cómo se llevan a cabo, para así identificar oportunidades en las que podríamos mejorar tu productividad, potencialmente con la ayuda de la inteligencia artificial. Para comenzar, ¿podrías decirme tu nombre?",
       },
     ]);
-    setChatProgressIndex(1);
+    setIndexChatboxReference(1);
     setIsLoading(false);
   };
 
@@ -88,8 +94,10 @@ function MainLayout({ setIsLoggedIn }: MainLayoutProps) {
       formData,
       // setTaskInProgressFromUserSelection,
       fetchedTasks,
+      setFetchedTasks,
       // isLoading,
-      setIsLoading
+      setIsLoading,
+      setIndexChatboxReference,
     });
   };
 
@@ -102,8 +110,8 @@ function MainLayout({ setIsLoggedIn }: MainLayoutProps) {
       // isSpeechEnabled,
       // formData,
       setFormData,
-      indexIdentityStep,
-      setChatProgressIndex,
+      indexChatboxReference,
+      setIndexChatboxReference,
       taskInProgress,
       setTaskInProgress,
       // sessionId.current!,
@@ -114,6 +122,7 @@ function MainLayout({ setIsLoggedIn }: MainLayoutProps) {
       // setTaskInProgressFromUserSelection,
       setFetchedTasks,
       fetchedTasks
+      // setIsChatboxEnabled
     );
   };
 
@@ -156,7 +165,8 @@ function MainLayout({ setIsLoggedIn }: MainLayoutProps) {
           setInputValue={setInputValue}
           loading={isLoading}
           isChatInitiated={isChatInitiated}
-          indexIdentityStep={indexIdentityStep}
+          indexChatboxReference={indexChatboxReference}
+          // isChatboxEnabled={isChatboxEnabled}
         />
       </span>
 
